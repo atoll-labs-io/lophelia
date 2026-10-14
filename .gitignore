@@ -1,3 +1,8 @@
 .worktrees/
 .env*
 .claude/worktrees/
+target/
+plugin/node_modules/
+plugin/main.js
+plugin/wasm-pkg/
+*.wasm

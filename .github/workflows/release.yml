@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Tag matches every declared version
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          manifest="$(node -p 'require("./plugin/manifest.json").version')"
+          package="$(node -p 'require("./plugin/package.json").version')"
+          workspace="$(awk '/^\[workspace.package\]$/ { s = 1; next } /^\[/ { s = 0 } s && /^version = / { gsub(/version = |"/, ""); print; exit }' Cargo.toml)"
+          status=0
+          for pair in "plugin/manifest.json=$manifest" "plugin/package.json=$package" "Cargo.toml [workspace.package]=$workspace"; do
+            if [ "${pair#*=}" != "$tag" ]; then
+              echo "::error::tag $GITHUB_REF_NAME does not match ${pair%%=*} (${pair#*=})"
+              status=1
+            fi
+          done
+          exit "$status"
+
+      - uses: ./.github/actions/build
+
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            plugin/main.js
+            plugin/manifest.json
+            plugin/styles.css
+
+      - name: Publish the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release create "$GITHUB_REF_NAME" plugin/main.js plugin/manifest.json plugin/styles.css --verify-tag --title "$GITHUB_REF_NAME"

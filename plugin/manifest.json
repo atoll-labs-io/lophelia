@@ -1,0 +1,10 @@
+{
+  "id": "lophelia",
+  "name": "Lophelia",
+  "version": "0.1.0",
+  "minAppVersion": "1.14.4",
+  "description": "A 3D graph view of your vault whose layout stays put from one opening to the next.",
+  "author": "ATOLL LABS",
+  "authorUrl": "https://github.com/atoll-labs-io",
+  "isDesktopOnly": true
+}
