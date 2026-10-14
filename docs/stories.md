@@ -97,7 +97,7 @@ Risque principal (spike « groupes lisibles en 3D » du brief) : New 3D Graph pr
 - [ ] Glisser avec le bouton gauche fait tourner la vue autour du centre du graphe, la molette rapproche ou éloigne la caméra, glisser avec le bouton droit la déplace ; les nœuds gardent leurs coordonnées.
 - [ ] Un clic sur un nœud ouvre la note correspondante ; le survol affiche son nom comme du texte, jamais interprété en HTML.
 - [ ] Le calcul de disposition tourne hors du fil principal : pendant le calcul, le fil principal n'est jamais bloqué plus de 50 ms (mesuré par le diagnostic) ; la vue affiche le texte « Calcul de la disposition : N % », mis à jour au moins une fois par seconde.
-- [ ] Sur le vault de test généré par le banc (s3) depuis le graphe de 2 500 nœuds, sur la machine de Mathieu (Arch, Hyprland), une commande de diagnostic affiche au moins 60 images/s en rotation, et jamais moins de 30.
+- [ ] Sur le vault de test généré par le banc (s3) depuis le graphe de 2 500 nœuds, sur la machine de Mathieu (Arch, Hyprland), une commande de diagnostic affiche au moins 60 images/s en rotation et en zoom à la molette, et jamais moins de 30.
 
 ### Notes for the agent
 Spike « exclusions » du brief : trouver l'API Obsidian fiable pour `userIgnoreFilters` (le graphe natif, Graph+ et New 3D Graph ne l'appliquent pas). Le rendu three.js vit dans `web/render/` et n'importe rien d'Obsidian : la page de démo (s11) le réutilise. Positions recalculées à chaque ouverture dans cette story ; la persistance vient avec s6. Surbrillance de dossier et couleurs de `graph.json` sont hors wedge.
@@ -132,7 +132,7 @@ Le bug de Filamental : un fichier écrit avec `vault.create` dans un dossier cac
 ### Acceptance criteria
 - [ ] Chaque ouverture de la vue enregistre la date du jour dans `.lophelia/usage.json`, au plus une fois par jour.
 - [ ] Lophelia n'écrit rien dans `.obsidian/plugins/` en dehors de ses fichiers d'installation.
-- [ ] Les réglages du plugin affichent, pour le mois en cours, le nombre de jours ouvrés avec ouverture et la moyenne par semaine ; un jour ouvré va du lundi au vendredi, jours fériés compris.
+- [ ] Les réglages du plugin affichent, pour le mois en cours, le nombre de jours ouvrés avec ouverture et la moyenne par semaine, égale à (jours ouvrés avec ouverture ÷ jours ouvrés écoulés dans le mois) × 5 — par exemple 9 ouvertures sur 15 jours ouvrés écoulés donnent 3,0 ; un jour ouvré va du lundi au vendredi, jours fériés compris.
 - [ ] Aucune donnée ne quitte la machine (le contrôle réseau de la CI, s1, reste vert).
 
 ### Notes for the agent
@@ -174,7 +174,7 @@ Risque principal (spike « propagation amortie », 3 jours sur le banc, point de
 - [ ] `positions.json` passe à la version 2 de son format, avec une empreinte de contenu par note ; un fichier en version 1 est lu, réécrit en version 2, et une copie de l'ancien est gardée à côté ; `docs/contracts/moteur.md` décrit la version 2.
 
 ### Notes for the agent
-Spike « renommage Obsidian fermé » du brief : une empreinte de contenu stockée avec la position permet de rapprocher une note disparue d'une note apparue. Les agents de Mathieu renomment souvent hors d'Obsidian. Événements Obsidian : `vault.on("rename")`, `vault.on("delete")`. Une suppression est passée au moteur en retirant le nœud et en déclarant ses anciens voisins comme modifiés (contrat s2) ; l'ajustement est celui de s8, et s9 ne modifie pas le moteur.
+Spike « renommage Obsidian fermé » du brief : une empreinte de contenu stockée avec la position permet de rapprocher une note disparue d'une note apparue. Les agents de Mathieu renomment souvent hors d'Obsidian. Événements Obsidian : `vault.on("rename")`, `vault.on("delete")`. Une suppression est passée au moteur en retirant le nœud et en déclarant ses anciens voisins comme modifiés (contrat s2) ; l'ajustement est celui de s8. L'empreinte (SHA-256 du contenu de la note) est calculée par le plugin, sans réseau, et stockée par le module positions comme une chaîne opaque ; elle ne traverse pas l'API de disposition. s9 change le format de `positions.json` (`crates/lophelia-core/src/positions/`, qu'elle possède) mais pas le calcul de disposition.
 
 ## s10-reglages-forces — Régler les forces comme dans le graphe 2D
 **As** Mathieu **I want** un panneau de réglages des forces (centre, répulsion, force et distance des liens) proche de celui du graphe 2D d'Obsidian **so that** j'ajuste la lisibilité des groupes à l'usage.
