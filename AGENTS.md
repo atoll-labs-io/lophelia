@@ -1,7 +1,7 @@
 <!-- Assembled by Polype. Edit AGENTS.local.md, then rerun the installer; changes made here are lost. -->
 # Polype — Rules of this repository
 
-Polype writes this section and rewrites it on every install. Your project speaks in `AGENTS.local.md` (settings, project commands, conventions), which the installer only reads, except to append the notes it moves out of a `CLAUDE.md`, and appends at the end of this file.
+Polype writes this section and rewrites it on every install. Your project speaks in `AGENTS.local.md` (settings, project commands, conventions), which the installer only reads, except to append the notes it moves out of a `CLAUDE.md` or a hand-written `AGENTS.md`, and appends at the end of this file.
 
 ## Reading settings
 
@@ -146,7 +146,7 @@ At most `Test budget` tests per story unless the plan argues for more. A test th
 
 `.claude/commands/`, `.claude/agents/` and `.claude/skills/` hold the commands, subagents and skills. `.polype/templates/` holds the templates: a reference to `templates/<name>.md` means `.polype/templates/<name>.md`. `.polype/hooks/po-gate.sh`, called `po-gate` in these rules, runs from the repository root or from any story worktree. `po-gate` checks the gates of Law 3. `.polype/hooks/po-bounds.sh`, called `po-bounds`, keeps the `implementer`, `qa` and `reviewer` subagents inside their bounds: a PreToolUse hook wired from those subagents' frontmatter, it decides which paths they may write and which git commands they may run. `.polype/hooks/po-run.sh`, called `po-run`, launches one check inside a story worktree: the check's output and exit code pass through unchanged, and the check's row — never its output — is appended to `docs/verif/<id>.md`. `.polype/hooks/po-session.sh`, called `po-session`, is the `SessionStart` hook the installer merges into the project's `.claude/settings.json`: it prints the framing stage, the ready stories, the lanes in flight and what waits for a human, and changes nothing. These files are committed on `Target branch` so every worktree has them and the pre-commit hook works there too; after a global pose only `.polype/` and `AGENTS.md` are in the repository, the rest living in `~/.claude/`.
 
-The only `CLAUDE.md` is the user's global one: no agent creates a `CLAUDE.md` or a `CLAUDE.local.md` in a project, and the project's notes go in `AGENTS.local.md`. The installer absorbs a root `CLAUDE.md` or `CLAUDE.local.md` into `AGENTS.local.md`, and the pre-commit refuses one at any depth (ADR-0086).
+Unless `Project CLAUDE file` is `kept`, the only `CLAUDE.md` is the user's global one: no agent creates a `CLAUDE.md` or a `CLAUDE.local.md` in a project, and the project's notes go in `AGENTS.local.md`. With `absorbed`, the installer absorbs a root `CLAUDE.md` or `CLAUDE.local.md` into `AGENTS.local.md`, and the pre-commit refuses one at any depth (ADR-0086); with `kept`, both stay, the installer makes the root `CLAUDE.md` start with `@AGENTS.md` and the pre-commit lets them through; with the line missing, nothing is touched and the setting is named (ADR-0089). A hand-written root `AGENTS.md` is absorbed the same way, under `## Notes moved from AGENTS.md`, but whatever `Project CLAUDE file` says, while a `CLAUDE.md` is absorbed only under `absorbed`; a file Polype did not lay down stops the installer unless `--set-aside` moves it (ADR-0088).
 
 Never edit an installed file: the next install overwrites it without asking. Project-specific needs become settings in `AGENTS.local.md`; general improvements go back to Polype itself.
 
@@ -245,4 +245,17 @@ Agents run these exactly as written. `—` means the project has no such command
 
 ## Conventions
 
-<< layout, stack, patterns, naming, commit style >>
+The repository had no base when these rules were written (ADR-0002): each rule cites the ADR or brief section that backs it instead of a `path:line`.
+
+- Code, identifiers, comments and commit messages are in English; documents under `docs/` are in French (atoll `AGENTS.md`).
+- Commit messages follow Conventional Commits (`type: subject`), as the history does.
+- `crates/lophelia-core` depends on no web or Obsidian crate (ADR-0003).
+- The plugin never computes a position: every layout goes through the engine contract (s2, premise 4 of `docs/brief.md`).
+- `web/render/` imports nothing from `obsidian` (ADR-0003, s11).
+- Never commit a `.wasm` file or a generated blob (base64 WASM or worker) (ADR-0004).
+- No network API in `plugin/`, `web/` or `demo/` (ADR-0004).
+- Only Obsidian's public API is used; the single undocumented access, if any, lives in one function under `plugin/src/vault/` (ADR-0005).
+- Everything Lophelia writes goes under `.lophelia/` through `vault.adapter`, atomically (temporary file, then rename); never `saveData` nor `vault.create` (ADR-0005).
+- Note names and paths are rendered as text (`textContent`), never through `innerHTML` (`docs/brief.md`, Security & abuse).
+- Rust passes `cargo fmt --check` and `cargo clippy -- -D warnings`; TypeScript compiles in strict mode.
+- Dependency versions are exact; every new dependency is justified in its pull request (`docs/brief.md`, Security & abuse).

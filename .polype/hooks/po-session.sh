@@ -11,6 +11,10 @@ top="$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null)" || exit 0
 top="$(cd "$top" 2>/dev/null && pwd -P)" || exit 0
 [ -f "$top/AGENTS.local.md" ] || [ -f "$top/.polype/version" ] || exit 0
 case "$(git -C "$top" rev-parse --abbrev-ref HEAD 2>/dev/null)" in story/*) exit 0 ;; esac
+if [ "${BASH_VERSINFO[0]}" -lt 4 ] || { [ "${BASH_VERSINFO[0]}" -eq 4 ] && [ "${BASH_VERSINFO[1]}" -lt 2 ]; }; then
+  echo "po-session: bash ${BASH_VERSINFO[0]}.${BASH_VERSINFO[1]} found, bash 4.2 or newer needed; project state not read (on macOS: brew install bash)"
+  exit 0
+fi
 
 local_md="$top/AGENTS.local.md"
 id_re='s[0-9]+-[a-z0-9-]+'
@@ -32,6 +36,7 @@ wtroot="$(setting 'Worktree root')"
 max_attempts="$(setting 'Max attempts')"
 merge_mode="$(setting 'Merge mode')"
 confirmation="$(setting 'Ship confirmation' | sed -E 's/[[:space:]]*\((forge|chosen)\)$//')"
+claude_md="$(setting 'Project CLAUDE file')"
 
 unreadable() { echo "Unreadable setting: $1"; }
 
@@ -234,7 +239,12 @@ waiting_for_a_human() {
   done
   lines+=(${ORPHANS[@]+"${ORPHANS[@]}"})
   for name in CLAUDE.md CLAUDE.local.md; do
-    [ -f "$top/$name" ] && lines+=("$name: Claude Code reads it instead of AGENTS.md → polype update . moves it into AGENTS.local.md")
+    [ -f "$top/$name" ] || continue
+    case "$claude_md" in
+      absorbed) lines+=("$name: Claude Code reads it instead of AGENTS.md → polype update . moves it into AGENTS.local.md") ;;
+      kept) ;;
+      *) lines+=("$name: Claude Code reads it instead of AGENTS.md → set Project CLAUDE file to absorbed or kept in AGENTS.local.md") ;;
+    esac
   done
   if [ ${#lines[@]} -eq 0 ]; then
     echo "Waiting for a human: nothing"
