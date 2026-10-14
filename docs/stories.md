@@ -33,8 +33,8 @@ Risque principal (spike 6 du brief, prioritaire) : charger du WASM dans un plugi
 - **Owns**: `Cargo.lock`, `crates/lophelia-core/Cargo.toml`, `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/contract/`, `crates/lophelia-core/src/positions/`, `crates/lophelia-core/tests/contract/`, `crates/lophelia-wasm/src/`, `docs/contracts/`, `.github/`
 
 ### Acceptance criteria
-- [ ] L'API du moteur prend des nœuds (identifiants opaques), des arêtes, des positions connues et des réglages, et rend une position (x, y, z) par nœud ; elle n'importe ni Obsidian ni le DOM (vérifié en CI : le crate `lophelia-core` compile sans aucune dépendance web).
-- [ ] Un nœud dont la position est connue et qui n'est touché par aucun changement ressort à la position exacte d'entrée.
+- [ ] L'API du moteur prend des nœuds (identifiants opaques), des arêtes, des positions connues, la liste des nœuds modifiés (créés ou dont les liens ont changé) et des réglages, et rend une position (x, y, z) par nœud ; un nœud sans position connue est traité comme créé ; elle n'importe ni Obsidian ni le DOM (vérifié en CI : le crate `lophelia-core` compile sans aucune dépendance web).
+- [ ] Quand la liste des nœuds modifiés est vide et que tous les nœuds ont une position connue, chaque nœud ressort à la position exacte d'entrée.
 - [ ] À graine fixe et entrées identiques, deux appels sur la même plateforme rendent les mêmes positions.
 - [ ] `positions.json` porte un champ de version de format, une ligne par nœud, triée par chemin ; sérialiser puis relire redonne exactement les mêmes positions.
 - [ ] Un fichier invalide (nombre non fini, taille au-delà de la borne, JSON cassé, version future inconnue) est refusé avec une erreur nommée, sans panique ; une version antérieure connue est lue.
@@ -42,7 +42,7 @@ Risque principal (spike 6 du brief, prioritaire) : charger du WASM dans un plugi
 - [ ] Le contrat est décrit dans `docs/contracts/moteur.md` et appelé tel quel depuis le module WASM.
 
 ### Notes for the agent
-Story contrat : elle ne sert aucun utilisateur final directement, mais s3, s4, s6, s8 et s11 en dépendent et la listent dans leur `Depends on`. Le moteur ne fait encore aucun calcul de disposition intelligent : un placement trivial suffit pour exercer le contrat. Borne de taille par défaut : 10 Mo. Les chemins sont des identifiants opaques pour le moteur ; c'est l'hôte qui sait ce qu'est une note.
+Story contrat : elle ne sert aucun utilisateur final directement, mais s3, s4, s6, s8 et s11 en dépendent et la listent dans leur `Depends on`. Le moteur ne fait encore aucun calcul de disposition intelligent : un placement trivial des nœuds créés suffit pour exercer le contrat ; s4 remplace le calcul complet et s8 l'ajustement autour des nœuds modifiés, sans changer cette API. Borne de taille par défaut : 10 Mo. Les chemins sont des identifiants opaques pour le moteur ; c'est l'hôte qui sait ce qu'est une note.
 
 ## s3-banc-evaluation — Un banc d'évaluation noté, rejoué à l'identique
 **As** Mathieu **I want** une commande qui note une disposition (séparation des groupes, stabilité, temps de calcul) sur des graphes figés **so that** chaque changement du moteur se juge sur des chiffres et pas au goût.
@@ -77,7 +77,7 @@ Aucune donnée de `~/dev` dans le dépôt, même hachée (pré-mortem, cause 6).
 - [ ] Sur les trois graphes synthétiques, la silhouette du moteur dépasse d'au moins 0,1 celle de la disposition naïve du banc (s3) et vaut au moins 0,3 ; la valeur obtenue est enregistrée dans `bench/references/` comme référence pour s8.
 - [ ] Sur le graphe de 2 500 nœuds, le calcul complet depuis zéro prend moins de 10 s en build release, mesuré par le banc.
 - [ ] Une fois la disposition stabilisée, un pas de calcul supplémentaire sans changement ne déplace aucun nœud (aucun tremblement).
-- [ ] Deux composantes non reliées ne se superposent pas.
+- [ ] Les boîtes englobantes de deux composantes non reliées sont disjointes.
 - [ ] La disposition passe par l'API du contrat (s2) sans la modifier.
 
 ### Notes for the agent
@@ -96,7 +96,7 @@ Risque principal (spike « groupes lisibles en 3D » du brief) : New 3D Graph pr
 - [ ] Les arêtes sont les liens résolus entre notes (`resolvedLinks`) ; un lien vers une note exclue ou inexistante ne crée pas d'arête.
 - [ ] Glisser avec le bouton gauche fait tourner la vue autour du centre du graphe, la molette rapproche ou éloigne la caméra, glisser avec le bouton droit la déplace ; les nœuds gardent leurs coordonnées.
 - [ ] Un clic sur un nœud ouvre la note correspondante ; le survol affiche son nom comme du texte, jamais interprété en HTML.
-- [ ] Le calcul de disposition tourne hors du fil principal : pendant le calcul, le fil principal n'est jamais bloqué plus de 50 ms (mesuré par le diagnostic), avec une progression visible.
+- [ ] Le calcul de disposition tourne hors du fil principal : pendant le calcul, le fil principal n'est jamais bloqué plus de 50 ms (mesuré par le diagnostic) ; la vue affiche le texte « Calcul de la disposition : N % », mis à jour au moins une fois par seconde.
 - [ ] Sur le vault de test généré par le banc (s3) depuis le graphe de 2 500 nœuds, sur la machine de Mathieu (Arch, Hyprland), une commande de diagnostic affiche au moins 60 images/s en rotation, et jamais moins de 30.
 
 ### Notes for the agent
@@ -116,11 +116,10 @@ Spike « exclusions » du brief : trouver l'API Obsidian fiable pour `userIgnore
 - [ ] L'écriture est atomique (fichier temporaire puis renommage) : un fichier tronqué n'existe jamais à la place du bon.
 - [ ] Un `positions.json` invalide n'est ni écrasé ni utilisé : il est renommé à côté, une notice Obsidian le signale, et une disposition neuve est calculée.
 - [ ] Le graphe complet s'affiche en moins de 2 s quand les positions existent, sur le vault de test généré par le banc (s3) depuis le graphe de 2 500 nœuds.
-- [ ] Une note présente dans le vault mais absente de `positions.json` est placée à une distance de ses notes liées inférieure à la distance médiane entre nœuds liés du graphe ; les autres ne bougent pas.
 - [ ] Supprimer `.lophelia/` fait repartir d'un premier calcul, sans erreur.
 
 ### Notes for the agent
-Le bug de Filamental : un fichier écrit avec `vault.create` dans un dossier caché ne se relit pas, car Obsidian n'indexe pas les dossiers cachés. Passer par `vault.adapter` (lecture et écriture directes). Lecture et validation par le moteur (contrat s2). Une note présente dans le vault mais absente du fichier est placée près de ses voisines connues.
+Le bug de Filamental : un fichier écrit avec `vault.create` dans un dossier caché ne se relit pas, car Obsidian n'indexe pas les dossiers cachés. Passer par `vault.adapter` (lecture et écriture directes). Lecture et validation par le moteur (contrat s2). Une note présente dans le vault mais absente du fichier est passée au moteur comme « créée » (contrat s2) ; le plugin ne calcule jamais une place lui-même. Son placement près de ses voisines arrive avec s8.
 
 ## s7-compteur-ouvertures — Le compteur local d'ouvertures
 **As** Mathieu **I want** voir combien de jours ouvrés j'ai ouvert Lophelia ce mois-ci **so that** je mesure le critère de réussite 1 sans rien envoyer hors de ma machine.
@@ -145,10 +144,11 @@ Sert la prémisse 5 (un premier utilisateur suffit) en mesurant le critère de r
 - **Complexity**: 4
 - **Depends on**: s7-compteur-ouvertures, s2-contrat-moteur
 - **Surface**: `screen`
-- **Owns**: `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/adjust/`, `crates/lophelia-core/tests/adjust/`, `bench/scenarios/`, `plugin/src/main.ts`, `plugin/src/sync/`, `plugin/src/persistence/`
+- **Owns**: `Cargo.lock`, `crates/lophelia-core/Cargo.toml`, `crates/lophelia-bench/`, `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/adjust/`, `crates/lophelia-core/tests/adjust/`, `bench/scenarios/`, `plugin/src/main.ts`, `plugin/src/sync/`, `plugin/src/persistence/`
 
 ### Acceptance criteria
-- [ ] Une note créée, la vue ouverte, apparaît en moins de 1 s à une distance de ses notes liées inférieure à la distance médiane entre nœuds liés du graphe ; pendant l'ajustement, le fil principal n'est jamais bloqué plus de 50 ms.
+- [ ] Une note créée, vue ouverte ou Obsidian fermé, apparaît à une distance de ses notes liées inférieure à la distance médiane entre nœuds liés du graphe ; vue ouverte, elle apparaît en moins de 1 s, sans que le fil principal soit bloqué plus de 50 ms.
+- [ ] La sous-commande de stabilité du banc affiche, pour la série scriptée, le déplacement moyen par quart de distance à la note modifiée et la silhouette après la série.
 - [ ] Sur la série scriptée du banc, les voisins directs de la note modifiée bougent (déplacement moyen non nul), et le déplacement moyen décroît avec la distance : le quart des nœuds les plus proches bouge plus que le quart suivant, qui bouge plus que la moitié la plus éloignée.
 - [ ] Après l'ajout d'un lien entre deux notes, leur distance diminue ; après son retrait, elle augmente.
 - [ ] Sur la série scriptée du banc, la moitié des nœuds les plus éloignés de la note modifiée bougent de moins de 1 % du rayon du graphe (critère 3b ; seuil réglable).
