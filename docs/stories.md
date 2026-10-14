@@ -37,7 +37,7 @@ Risque principal (spike 6 du brief, prioritaire) : charger du WASM dans un plugi
 - [ ] Quand la liste des nœuds modifiés est vide et que tous les nœuds ont une position connue, chaque nœud ressort à la position exacte d'entrée.
 - [ ] À graine fixe et entrées identiques, deux appels sur la même plateforme rendent les mêmes positions.
 - [ ] `positions.json` porte un champ de version de format, une ligne par nœud, triée par chemin ; sérialiser puis relire redonne exactement les mêmes positions.
-- [ ] Un fichier invalide (nombre non fini, taille au-delà de la borne, JSON cassé, version future inconnue) est refusé avec une erreur nommée, sans panique ; une version antérieure connue est lue.
+- [ ] Un fichier invalide (nombre non fini, taille au-delà de la borne, JSON cassé, version future inconnue) est refusé avec une erreur nommée, sans panique ; le lecteur aiguille sur le numéro de version, et une version inconnue est refusée (la lecture des versions antérieures vient avec s9).
 - [ ] Une entrée dont le chemin est malformé (absolu, contenant `..`, vide) fait refuser le fichier avec une erreur nommée ; une entrée dont le chemin ne correspond à aucun nœud fourni par l'hôte est ignorée à la lecture et retirée à l'écriture suivante.
 - [ ] Le contrat est décrit dans `docs/contracts/moteur.md` et appelé tel quel depuis le module WASM.
 
