@@ -1,0 +1,68 @@
+name: Build and check
+description: Installs the pinned toolchains, runs every check and builds plugin/main.js from the sources.
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version-file: plugin/.nvmrc
+        package-manager-cache: false
+
+    - name: Install the Rust toolchain from rust-toolchain.toml
+      shell: bash
+      run: |
+        rustup toolchain install
+        rustup show active-toolchain
+
+    - name: Install wasm-bindgen-cli and cargo-audit at exact versions
+      shell: bash
+      run: |
+        wasm_bindgen="$(awk '/^name = "wasm-bindgen"$/ { getline; gsub(/version = |"/, ""); print; exit }' Cargo.lock)"
+        cargo install --locked wasm-bindgen-cli --version "$wasm_bindgen"
+        cargo install --locked cargo-audit --version 0.22.2
+
+    - name: Install plugin dependencies (strict)
+      shell: bash
+      run: npm --prefix plugin ci
+
+    - name: No WASM file or embedded blob tracked
+      shell: bash
+      run: node scripts/check-no-blobs.mjs
+
+    - name: Rust formatting
+      shell: bash
+      run: cargo fmt --check
+
+    - name: Clippy
+      shell: bash
+      run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+    - name: Rust tests
+      shell: bash
+      run: cargo test --workspace --locked
+
+    - name: Script tests
+      shell: bash
+      run: node --test 'scripts/*.test.mjs'
+
+    - name: Rust advisories
+      shell: bash
+      run: cargo audit
+
+    - name: npm advisories (high and critical)
+      shell: bash
+      run: npm --prefix plugin audit --audit-level=high
+
+    - name: Build the plugin
+      shell: bash
+      run: npm --prefix plugin run build
+
+    - name: No network API in the bundle
+      shell: bash
+      run: node scripts/check-network.mjs plugin/main.js
+
+    - name: Bundle size
+      shell: bash
+      run: |
+        echo "plugin/main.js: $(wc -c < plugin/main.js) bytes" >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,26 @@
+/* Contrast corrections approved in docs/design-system.md, scoped to the Lophelia view only. */
+.theme-light .lophelia-view {
+  --text-faint: #717171;
+  --text-accent: #8656f4;
+  --text-error: #e72038;
+  --interactive-accent: #8457f5;
+  --background-modifier-border-focus: #959595;
+}
+
+.theme-dark .lophelia-view {
+  --text-faint: #8e8e8e;
+  --interactive-accent: #8656f4;
+  --background-modifier-border-focus: #676767;
+}
+
+.lophelia-view {
+  background-color: var(--background-primary);
+}
+
+.lophelia-view .lophelia-engine-version {
+  color: var(--text-muted);
+}
+
+.lophelia-view .lophelia-engine-error {
+  color: var(--text-error);
+}
