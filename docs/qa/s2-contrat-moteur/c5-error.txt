@@ -1,0 +1,59 @@
+Scenario: c5-error
+Script: docs/qa/s2-contrat-moteur/scenarios.rs (quoted whole there), the binary qa-scen of a scratch crate depending on lophelia-core by path, built from a copy of the tracked files outside the worktree
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/qa-scen c5-error
+Stdin: /dev/null
+--- stdout ---
+x = 1e999:
+  Err code=non_finite_number msg=non-finite number: number out of range at line 1 column 50
+x = -1e400:
+  Err code=non_finite_number msg=non-finite number: number out of range at line 1 column 51
+x = NaN (bare literal):
+  Err code=invalid_json msg=invalid JSON: expected value at line 1 column 46
+x = "1" (string):
+  Err code=invalid_json msg=invalid JSON: invalid type: string "1", expected f64 at line 1 column 48
+broken JSON (truncated):
+  Err code=invalid_json msg=invalid JSON: EOF while parsing an object at line 1 column 47
+empty string:
+  Err code=invalid_json msg=invalid JSON: EOF while parsing a value at line 1 column 0
+not an object: []:
+  Err code=missing_version msg=no integer "version" field
+future version 2:
+  Err code=unsupported_version msg=unsupported format version 2
+version 0:
+  Err code=unsupported_version msg=unsupported format version 0
+version 99999999999999999999 (beyond u64):
+  Err code=missing_version msg=no integer "version" field
+version -1:
+  Err code=missing_version msg=no integer "version" field
+version 1.0:
+  Err code=missing_version msg=no integer "version" field
+version "1":
+  Err code=missing_version msg=no integer "version" field
+no version:
+  Err code=missing_version msg=no integer "version" field
+version 1, no positions:
+  Err code=invalid_json msg=invalid JSON: missing field `positions` at line 1 column 13
+version 1, unknown entry field w:
+  Err code=invalid_json msg=invalid JSON: unknown field `w`, expected one of `path`, `x`, `y`, `z` at line 1 column 62
+version 1, unknown top-level field:
+  Err code=invalid_json msg=invalid JSON: unknown field `extra`, expected `version` or `positions` at line 1 column 35
+version 1, entry missing z:
+  Err code=invalid_json msg=invalid JSON: missing field `z` at line 1 column 53
+trailing garbage:
+  Err code=invalid_json msg=invalid JSON: trailing characters at line 1 column 30
+array nested 100000 deep:
+  Err code=invalid_json msg=invalid JSON: recursion limit exceeded at line 1 column 128
+version holding an array nested 100000 deep:
+  Err code=invalid_json msg=invalid JSON: recursion limit exceeded at line 1 column 138
+duplicate path:
+  Err code=duplicate_path msg=path "a.md" is given twice
+duplicate key version (1 then 2):
+  Err code=invalid_json msg=invalid JSON: duplicate field `version` at line 1 column 22
+file of DEFAULT_MAX_BYTES + 1 = 10485761 bytes (valid JSON padded):
+  Err code=too_large msg=file is 10485761 bytes, above the 10485760 byte limit
+file above the limit that is also broken JSON (size checked first):
+  Err code=too_large msg=file is 10485770 bytes, above the 10485760 byte limit
+--- stderr ---
+--- exit code ---
+0

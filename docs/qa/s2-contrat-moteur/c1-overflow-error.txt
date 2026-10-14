@@ -1,0 +1,17 @@
+Scenario: c1-overflow (finite settings giving a non-finite layout); replayed once, identical output
+Script: docs/qa/s2-contrat-moteur/scenarios-overflow.rs (quoted whole there), the binary overflow of the same scratch crate
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/overflow
+Stdin: /dev/null
+--- stdout ---
+n=2 link_distance=1e308: layout Ok, 0 non-finite of 6 values, first: [-9.905162183429647e307, 3.6877178771195335e307, -1.0986461808402476e308]
+  write_positions of that output: Ok
+n=8 link_distance=1e308: layout Ok, 24 non-finite of 24 values, first: [-inf, inf, -inf]
+  write_positions of that output: Err code=non_finite_number msg=non-finite number: position of "n0.md"
+n=8 link_distance=1e307: layout Ok, 0 non-finite of 24 values, first: [-1.572346486989185e307, 5.853887237501483e306, -1.7439921032066538e307]
+  write_positions of that output: Ok
+n=1000 link_distance=1e306: layout Ok, 0 non-finite of 3000 values, first: [-7.861732434945925e306, 2.926943618750741e306, -8.719960516033269e306]
+  write_positions of that output: Ok
+--- stderr ---
+--- exit code ---
+0

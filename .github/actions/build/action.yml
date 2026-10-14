@@ -34,6 +34,17 @@ runs:
       shell: bash
       run: cargo fmt --check
 
+    - name: Engine core has no web dependency
+      shell: bash
+      run: |
+        tree="$(cargo tree --locked -p lophelia-core -e normal,build --target all --prefix none --format '{p}')"
+        web="$(grep -E '^(wasm-bindgen|js-sys|web-sys|gloo|obsidian)' <<< "$tree" || true)"
+        if [ -n "$web" ]; then
+          echo "lophelia-core depends on a web crate:"
+          echo "$web"
+          exit 1
+        fi
+
     - name: Clippy
       shell: bash
       run: cargo clippy --workspace --all-targets --locked -- -D warnings

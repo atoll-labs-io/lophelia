@@ -1,0 +1,13 @@
+Scenario: c2-error
+Script: docs/qa/s2-contrat-moteur/scenarios.rs (quoted whole there), the binary qa-scen of a scratch crate depending on lophelia-core by path, built from a copy of the tracked files outside the worktree
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/qa-scen c2-error
+Stdin: /dev/null
+--- stdout ---
+changed [], all known, one coordinate NaN:
+  Err code=non_finite msg=non-finite number in known_xyz
+changed [], all known, known_xyz short by one:
+  Err code=malformed_input msg=malformed input: known_xyz must hold 3 values per known node
+--- stderr ---
+--- exit code ---
+0

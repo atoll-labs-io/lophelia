@@ -1,0 +1,17 @@
+Scenario: c4-error
+Script: docs/qa/s2-contrat-moteur/scenarios.rs (quoted whole there), the binary qa-scen of a scratch crate depending on lophelia-core by path, built from a copy of the tracked files outside the worktree
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/qa-scen c4-error
+Stdin: /dev/null
+--- stdout ---
+write with 5 values for 2 nodes:
+  Err code=length_mismatch msg=expected 6 coordinates, got 5
+write with NaN:
+  Err code=non_finite_number msg=non-finite number: position of "a.md"
+write with +inf:
+  Err code=non_finite_number msg=non-finite number: position of "a.md"
+write for a node whose id is ../x.md:
+  Err code=malformed_path msg=malformed path "../x.md": parent segment
+--- stderr ---
+--- exit code ---
+0
