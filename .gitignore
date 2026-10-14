@@ -6,3 +6,4 @@ plugin/node_modules/
 plugin/main.js
 plugin/wasm-pkg/
 *.wasm
+bench/local/

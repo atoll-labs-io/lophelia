@@ -1,0 +1,29 @@
+Criterion 8 - replaying the same command twice gives the same figures (reading of main, PR #60: scores, gaps and written files repeat; only the wall-clock time varies)
+Working directory: <tmp>/repo
+Environment: CARGO_TARGET_DIR=<tmp>/target
+stdin: none
+
+$ cargo run -q -p lophelia-bench -- bench/graphs/sbm-1000.json > e1.txt   (twice, e1 / e2)
+$ diff e1.txt e2.txt
+4c4
+< temps de calcul du moteur : 0.267 ms
+---
+> temps de calcul du moteur : 0.289 ms
+--- diff exit code: 1 (only the time line differs) ---
+
+$ cargo run -q -p lophelia-bench -- stability bench/graphs/sbm-1000.json bench/scenarios/base.json > s1.txt   (twice, s1 / s2)
+$ cmp s1.txt s2.txt   -> identical
+
+$ cargo run -q -p lophelia-bench -- snapshot <tmp>/scratch/vault-100   (twice, output copied between runs)
+$ cmp snap1.json bench/local/vault-100.json   -> identical
+
+$ cargo run -q -p lophelia-bench -- vault bench/graphs/sbm-1000.json <tmp>/scratch/v1
+vault écrit : <tmp>/scratch/v1 (1000 notes)
+$ cargo run -q -p lophelia-bench -- vault bench/graphs/sbm-1000.json <tmp>/scratch/v2
+vault écrit : <tmp>/scratch/v2 (1000 notes)
+$ diff -r v1 v2   -> identical
+
+generate: regenerated graphs byte-identical to the committed ones (c1-graphes.txt).
+--record: the gap after recording reads +0.000000 (c2-notation.txt).
+
+Invalid input: replay has no input of its own; see the -error transcripts of each command.

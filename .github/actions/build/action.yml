@@ -30,6 +30,16 @@ runs:
       shell: bash
       run: node scripts/check-no-blobs.mjs
 
+    - name: Nothing tracked under bench/local
+      shell: bash
+      run: |
+        tracked="$(git ls-files bench/local)"
+        if [ -n "$tracked" ]; then
+          echo "bench/local/ holds local snapshots and must stay untracked:"
+          echo "$tracked"
+          exit 1
+        fi
+
     - name: Rust formatting
       shell: bash
       run: cargo fmt --check

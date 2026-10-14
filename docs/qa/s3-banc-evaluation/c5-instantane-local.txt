@@ -1,0 +1,43 @@
+Criterion 5 - the bench accepts a local snapshot (bench/local/), ignored by git; CI fails if a file of bench/local/ is tracked
+Working directory: <tmp>/repo
+Environment: CARGO_TARGET_DIR=<tmp>/target
+stdin: none
+
+# Snapshots written by c6 into <tmp>/repo/bench/local/, then scored by the bench
+$ ls bench/local
+hand.json
+vault-100.json
+
+$ cargo run -q -p lophelia-bench -- bench/local/hand.json
+graphe : hand (5 nœuds, 4 arêtes, 2 communautés)
+silhouette moteur : 0.024174
+silhouette naïve : 0.438664
+temps de calcul du moteur : 0.008 ms
+référence : aucune
+--- exit code: 0 ---
+
+$ cargo run -q -p lophelia-bench -- bench/local/vault-100.json
+graphe : vault-100 (100 nœuds, 347 arêtes, 4 communautés)
+silhouette moteur : -0.070217
+silhouette naïve : 0.470079
+temps de calcul du moteur : 0.035 ms
+référence : aucune
+--- exit code: 0 ---
+
+# Ignored by git: not observed
+$ git -C <worktree> check-ignore -v bench/local/x.json
+PreToolUse:Bash hook error: po-bounds: git check-ignore is forbidden in mode qa, which runs reading verbs only
+(refused; not reached by another route - see Not seen)
+
+# CI step (read, not run)
+$ grep -n -A9 "Nothing tracked under bench/local" .github/actions/build/action.yml
+33:    - name: Nothing tracked under bench/local
+34-      shell: bash
+35-      run: |
+36:        tracked="$(git ls-files bench/local)"
+37-        if [ -n "$tracked" ]; then
+38:          echo "bench/local/ holds local snapshots and must stay untracked:"
+39-          echo "$tracked"
+40-          exit 1
+41-        fi
+(.github/workflows/ci.yml:18 and release.yml:36 use ./.github/actions/build)

@@ -1,0 +1,34 @@
+Criterion 4 - invalid inputs
+Working directory: <tmp>/repo
+Environment: CARGO_TARGET_DIR=<tmp>/target
+stdin: none
+
+$ cargo run -q -p lophelia-bench -- stability bench/graphs/sbm-100.json
+--- stderr ---
+usage :
+  lophelia-bench <graphe.json> [--record]
+  lophelia-bench generate
+  lophelia-bench stability <graphe.json> <scénario.json>
+  lophelia-bench snapshot <dossier-vault>
+  lophelia-bench vault <graphe.json> <dossier>
+--- exit code: 2 ---
+
+$ echo '{"version":1,"steps":[{"unlink":["c00/n00-0000.md","c03/n03-0009.md"]}]}' > <tmp>/scratch/unlink-missing.json
+$ cargo run -q -p lophelia-bench -- stability bench/graphs/sbm-100.json <tmp>/scratch/unlink-missing.json
+erreur : link_missing: "c00/n00-0000.md" and "c03/n03-0009.md" are not linked
+--- exit code: 1 ---
+
+$ echo '{"version":1,"steps":[{"link":["c00/n00-0000.md","zz.md"]}]}' > <tmp>/scratch/unknown.json
+$ cargo run -q -p lophelia-bench -- stability bench/graphs/sbm-100.json <tmp>/scratch/unknown.json
+erreur : unknown_node: unknown node "zz.md"
+--- exit code: 1 ---
+
+$ echo '{"version":1,"steps":[{"link":[...],"unlink":[...]}]}' > <tmp>/scratch/both.json
+$ cargo run -q -p lophelia-bench -- stability bench/graphs/sbm-100.json <tmp>/scratch/both.json
+erreur : invalid_step: step 1 must hold exactly one of "link", "unlink", "create"
+--- exit code: 1 ---
+
+# F1: a malformed scenario file - the message does not say whether the graph or the scenario failed (replayed once, same output)
+$ cargo run -q -p lophelia-bench -- stability bench/graphs/sbm-100.json <tmp>/scratch/bad.json      # bad.json holds "not json"
+erreur : invalid_json: invalid JSON: expected ident at line 1 column 2
+--- exit code: 1 ---
