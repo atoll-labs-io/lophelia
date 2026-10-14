@@ -63,7 +63,7 @@ Story contrat : elle ne sert aucun utilisateur final directement, mais s3, s4, s
 - [ ] Rejouer deux fois la même commande donne les mêmes chiffres.
 
 ### Notes for the agent
-Aucune donnée de `~/dev` dans le dépôt, même hachée (pré-mortem, cause 6). L'instantané de `~/dev` est produit par la sous-commande `snapshot`, lancée par Mathieu sur sa machine ; il sert au spike de s4, à la mesure de diamètre de s8 et au seuil d'arrêt du 15/11/2026. Sa résolution des liens par nom de note approche celle d'Obsidian (`resolvedLinks`) sans l'égaler : c'est assez pour un banc. Les communautés de référence des graphes synthétiques sont celles de leur génération ; pour un instantané réel, une détection de communautés (Louvain ou équivalent) les fournit.
+Aucune donnée de `~/dev` dans le dépôt, même hachée (pré-mortem, cause 6). L'instantané de `~/dev` est produit par la sous-commande `snapshot`, lancée par Mathieu sur sa machine ; il sert au spike de s4, à la mesure de diamètre de s8 et au seuil d'arrêt du 15/11/2026. Sa résolution des liens par nom de note approche celle d'Obsidian (`resolvedLinks`) sans l'égaler : c'est assez pour un banc. Les communautés de référence des graphes synthétiques sont celles de leur génération ; pour un instantané réel, une détection de communautés (Louvain ou équivalent) les fournit. Huit critères, au-delà des sept indicatifs : accepté (revue 5), car les sous-commandes `snapshot` et `vault` sont petites et une story séparée devrait passer avant s4, ce qui renuméroterait les suivantes ; le plan les découpe en tâches distinctes.
 
 ## s4-disposition-lisible — Une disposition 3D dont les groupes de liens se voient
 **As** Mathieu **I want** que le moteur calcule, sans positions connues, une disposition 3D où les groupes de notes liées sont séparés **so that** le graphe ne soit pas une boule uniforme et que sa forme puisse se mémoriser.
@@ -174,7 +174,7 @@ Risque principal (spike « propagation amortie », 3 jours sur le banc, point de
 - [ ] `positions.json` passe à la version 2 de son format, avec une empreinte de contenu par note ; un fichier en version 1 est lu, réécrit en version 2, et une copie de l'ancien est gardée à côté ; `docs/contracts/moteur.md` décrit la version 2.
 
 ### Notes for the agent
-Spike « renommage Obsidian fermé » du brief : une empreinte de contenu stockée avec la position permet de rapprocher une note disparue d'une note apparue. Les agents de Mathieu renomment souvent hors d'Obsidian. Événements Obsidian : `vault.on("rename")`, `vault.on("delete")`.
+Spike « renommage Obsidian fermé » du brief : une empreinte de contenu stockée avec la position permet de rapprocher une note disparue d'une note apparue. Les agents de Mathieu renomment souvent hors d'Obsidian. Événements Obsidian : `vault.on("rename")`, `vault.on("delete")`. Une suppression est passée au moteur en retirant le nœud et en déclarant ses anciens voisins comme modifiés (contrat s2) ; l'ajustement est celui de s8, et s9 ne modifie pas le moteur.
 
 ## s10-reglages-forces — Régler les forces comme dans le graphe 2D
 **As** Mathieu **I want** un panneau de réglages des forces (centre, répulsion, force et distance des liens) proche de celui du graphe 2D d'Obsidian **so that** j'ajuste la lisibilité des groupes à l'usage.
@@ -186,7 +186,7 @@ Spike « renommage Obsidian fermé » du brief : une empreinte de contenu stock�
 
 ### Acceptance criteria
 - [ ] Un panneau dans la vue propose quatre curseurs : centre, répulsion, force des liens, distance des liens, avec les valeurs par défaut du moteur.
-- [ ] Les réglages sont enregistrés dans `.lophelia/settings.json` et voyagent avec le vault.
+- [ ] Les réglages sont enregistrés dans `.lophelia/settings.json` ; après fermeture et réouverture d'Obsidian, les quatre curseurs affichent les valeurs enregistrées.
 - [ ] Changer un réglage ne déplace rien tant que l'utilisateur n'a pas cliqué « Appliquer » ; « Appliquer » recalcule la disposition et l'enregistre.
 - [ ] Un bouton « Valeurs par défaut » remet les quatre curseurs à leurs valeurs initiales.
 
