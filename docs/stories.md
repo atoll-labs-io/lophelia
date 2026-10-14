@@ -29,7 +29,7 @@ Risque principal (spike 6 du brief, prioritaire) : charger du WASM dans un plugi
 - **Complexity**: 3
 - **Depends on**: s1-chaine-release
 - **Surface**: `endpoint`
-- **Owns**: `crates/lophelia-core/Cargo.toml`, `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/contract/`, `crates/lophelia-core/src/positions/`, `crates/lophelia-core/tests/contract/`, `crates/lophelia-wasm/src/`, `docs/contracts/`, `.github/`
+- **Owns**: `Cargo.lock`, `crates/lophelia-core/Cargo.toml`, `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/contract/`, `crates/lophelia-core/src/positions/`, `crates/lophelia-core/tests/contract/`, `crates/lophelia-wasm/src/`, `docs/contracts/`, `.github/`
 
 ### Acceptance criteria
 - [ ] L'API du moteur prend des nœuds (identifiants opaques), des arêtes, des positions connues et des réglages, et rend une position (x, y, z) par nœud ; elle n'importe ni Obsidian ni le DOM (vérifié en CI : le crate `lophelia-core` compile sans aucune dépendance web).
@@ -48,11 +48,12 @@ Story contrat : elle ne sert aucun utilisateur final directement, mais s4, s6, s
 - **Complexity**: 3
 - **Depends on**: s2-contrat-moteur
 - **Surface**: `command`
-- **Owns**: `crates/lophelia-bench/`, `bench/`, `.gitignore`, `.github/`
+- **Owns**: `Cargo.toml`, `Cargo.lock`, `crates/lophelia-bench/`, `bench/`, `.gitignore`, `.github/`
 
 ### Acceptance criteria
 - [ ] Le dépôt contient des graphes synthétiques à communautés connues de 100, 1 000 et 2 500 nœuds, générés à graine fixe.
 - [ ] `cargo run -p lophelia-bench -- <graphe>` affiche le score de silhouette des communautés dans l'espace 3D, le temps de calcul et, si une référence existe, l'écart à cette référence.
+- [ ] Le banc calcule aussi une disposition de référence naïve (ressorts sur les liens + répulsion uniforme, paramètres fixes écrits dans le code) et affiche sa silhouette à côté de celle du moteur.
 - [ ] Une sous-commande de stabilité rejoue une série scriptée de modifications et affiche le critère 3a (écart maximal quand rien ne change) et 3b (déplacement de la moitié des nœuds les plus éloignés de la note modifiée, en % du rayon).
 - [ ] Le banc accepte un instantané local (`bench/local/`), ignoré par git ; la CI échoue si un fichier de `bench/local/` est versionné.
 - [ ] Rejouer deux fois la même commande donne les mêmes chiffres.
@@ -66,17 +67,17 @@ Aucune donnée de `~/dev` dans le dépôt, même hachée (pré-mortem, cause 6).
 - **Complexity**: 4
 - **Depends on**: s3-banc-evaluation
 - **Surface**: `command`
-- **Owns**: `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/layout/`, `crates/lophelia-core/tests/layout/`, `bench/references/`
+- **Owns**: `Cargo.lock`, `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/layout/`, `crates/lophelia-core/tests/layout/`, `bench/references/`
 
 ### Acceptance criteria
-- [ ] Sur les trois graphes synthétiques, le score de silhouette affiché par le banc atteint au moins la référence enregistrée dans `bench/references/` par cette story.
-- [ ] Sur le graphe de 2 500 nœuds, le calcul complet tient sous la limite enregistrée dans la PR (cible : progression visible, pas de blocage).
+- [ ] Sur les trois graphes synthétiques, la silhouette du moteur dépasse d'au moins 0,1 celle de la disposition naïve du banc (s3) et vaut au moins 0,3 ; la valeur obtenue est enregistrée dans `bench/references/` comme référence pour s8.
+- [ ] Sur le graphe de 2 500 nœuds, le calcul complet depuis zéro prend moins de 10 s en build release, mesuré par le banc.
 - [ ] Une fois la disposition stabilisée, un pas de calcul supplémentaire sans changement ne déplace aucun nœud (aucun tremblement).
 - [ ] Deux composantes non reliées ne se superposent pas.
 - [ ] La disposition passe par l'API du contrat (s2) sans la modifier.
 
 ### Notes for the agent
-Risque principal (spike « groupes lisibles en 3D » du brief) : New 3D Graph produit une boule sans groupes. Comprendre pourquoi (répulsion en 3D, échelle, forces de liens) et comparer au moins deux approches sur le banc avant de choisir ; noter les chiffres dans la recherche. Point de contrôle au 15/11/2026 (seuil d'arrêt du brief). Les forces doivent rester réglables comme dans le graphe 2D d'Obsidian (centre, répulsion, force et distance des liens). Pour l'arrêt des tremblements : geler les nœuds sous un seuil d'énergie plutôt que de laisser la simulation tourner.
+Risque principal (spike « groupes lisibles en 3D » du brief) : New 3D Graph produit une boule sans groupes. Comprendre pourquoi (répulsion en 3D, échelle, forces de liens) et comparer au moins deux approches sur le banc avant de choisir ; noter les chiffres dans la recherche. Point de contrôle au 15/11/2026 (seuil d'arrêt du brief). Seuils par défaut (0,1 ; 0,3 ; 10 s), réglables si le spike montre qu'ils sont mal placés. Les forces doivent rester réglables comme dans le graphe 2D d'Obsidian (centre, répulsion, force et distance des liens). Pour l'arrêt des tremblements : geler les nœuds sous un seuil d'énergie plutôt que de laisser la simulation tourner.
 
 ## s5-vue-vault-3d — Le vault en 3D dans Obsidian, exclusions respectées
 **As** Mathieu **I want** ouvrir Lophelia et voir toutes mes notes non exclues en 3D, naviguer et ouvrir une note d'un clic **so that** j'aie la vue d'ensemble du vault et que j'aille droit à une note pour vérifier une réponse d'IA.
