@@ -21,3 +21,9 @@ A decision the person took is not logged here: it is an ADR or a story.
 | 2026-10-14 | s2-contrat-moteur | Build de production lancé au ship | Build stage: ship-if-route ; le manifeste `crates/lophelia-core/Cargo.toml` a changé. |
 | 2026-10-14 | s2-contrat-moteur | Verrou `index.lock` du worktree supprimé | Vide et sans processus git actif ; il bloquait l'avance rapide du couloir. |
 | 2026-10-14 | s2-contrat-moteur | Étape « file the open findings » de /po-ship non jouée | Constats déjà ouverts par octo (#54 à #58). |
+| 2026-10-14 | s3-banc-evaluation | Vague 3 limitée à s3 | Seule story prête une fois s2 livrée. |
+| 2026-10-14 | s3-banc-evaluation | Plan validé sans relecture humaine ; Louvain, RNG et analyse des arguments écrits sans dépendance | Plan validation: autonomous ; rien n'entre dans le lockfile, donc aucun choix technique à soumettre. |
+| 2026-10-14 | s3-banc-evaluation | Critère 8 reformulé (PR #60) : seuls les scores, écarts et fichiers doivent se répéter | Le temps de calcul, mesuré à l'horloge, ne peut pas se répéter ; une seule lecture possible. |
+| 2026-10-14 | s3-banc-evaluation | QA gardée `complete` malgré le refus de `git check-ignore` par po-bounds | Le refus coupe une vérification, pas le parcours ; le pilote a vérifié lui-même que `bench/local/` est ignoré. |
+| 2026-10-14 | s3-banc-evaluation | Build de production lancé au ship | Le `Cargo.toml` racine a changé (nouveau membre du workspace). |
+| 2026-10-14 | s3-banc-evaluation | Étape « file the open findings » de /po-ship non jouée | Constats déjà ouverts par octo (#64 à #71). |
