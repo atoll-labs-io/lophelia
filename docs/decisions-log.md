@@ -14,3 +14,10 @@ A decision the person took is not logged here: it is an ADR or a story.
 | 2026-10-14 | s1-chaine-release | Commit d'atterrissage poussé sur la PR avant la revue du correctif | Obtenir le verdict de la CI pendant la QA et la revue ; le ship a reconstruit et repoussé le commit ensuite. |
 | 2026-10-14 | s1-chaine-release | Revue du tour 1 bornée à `origin/main...story/s1-chaine-release` | La `main` locale était en retard ; le premier reviewer avait signalé à tort `AGENTS.local.md`, déjà sur `origin/main`. |
 | 2026-10-14 | s1-chaine-release | Étape « file the open findings » de /po-ship non jouée | Tous les constats étaient déjà ouverts par octo (#40 à #48), canal imposé par Mathieu ; la jouer aurait créé des doublons. |
+| 2026-10-14 | s2-contrat-moteur | Vague 2 limitée à s2 | Seule story prête une fois s1 livrée : s3 et les suivantes dépendent de s2. |
+| 2026-10-14 | s2-contrat-moteur | Réponse « le plus optimisé sur du gros volume de nœuds » lue comme l'option 2 de l'ADR-0008 | serde_json pour le fichier seul, tableaux typés à la frontière WASM : c'est l'option qui évite la sérialisation à chaque calcul. |
+| 2026-10-14 | s2-contrat-moteur | Plan validé sans relecture humaine après ce choix | Plan validation: autonomous. |
+| 2026-10-14 | s2-contrat-moteur | Commit d'atterrissage poussé et PR ouverte pendant la QA | Obtenir le verdict de la CI en parallèle ; reconstruit et repoussé après la revue. |
+| 2026-10-14 | s2-contrat-moteur | Build de production lancé au ship | Build stage: ship-if-route ; le manifeste `crates/lophelia-core/Cargo.toml` a changé. |
+| 2026-10-14 | s2-contrat-moteur | Verrou `index.lock` du worktree supprimé | Vide et sans processus git actif ; il bloquait l'avance rapide du couloir. |
+| 2026-10-14 | s2-contrat-moteur | Étape « file the open findings » de /po-ship non jouée | Constats déjà ouverts par octo (#54 à #58). |
