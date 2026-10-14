@@ -1,0 +1,18 @@
+Scenario: c1
+Script: docs/qa/s2-contrat-moteur/scenarios.rs (quoted whole there), the binary qa-scen of a scratch crate depending on lophelia-core by path, built from a copy of the tracked files outside the worktree
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/qa-scen c1
+Stdin: /dev/null
+--- stdout ---
+ids: ["notes/a.md", "b.md", "c d/é.md"]  node_count = 3
+layout: edges [0,1, 1,2], known node 1 = (1,2,3), changed [2], seed 7, default forces [0.05, 30.0, 1.0, 30.0]
+  Ok(9 values) [-39.3860514626329, 31.331487759986523, -11.893831724827775, 1.0, 2.0, 3.0, -39.86159195515893, 18.0357018022076, -8.52586144162789]
+layout: no known positions, changed [] (every node is treated as created)
+  Ok(9 values) [-39.3860514626329, 31.331487759986523, -11.893831724827775, -13.501611812334456, 2.4586503439197966, -27.941432926026785, -39.86159195515893, 18.0357018022076, -8.52586144162789]
+layout: only node 0 known, changed [] (nodes 1 and 2 have no position: created)
+  Ok(9 values) [9.0, 9.0, 9.0, -13.501611812334456, 2.4586503439197966, -27.941432926026785, -39.86159195515893, 18.0357018022076, -8.52586144162789]
+graph with no node:
+  Ok(0 values) []
+--- stderr ---
+--- exit code ---
+0

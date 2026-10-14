@@ -1,0 +1,43 @@
+Scenario: c6-error
+Script: docs/qa/s2-contrat-moteur/scenarios.rs (quoted whole there), the binary qa-scen of a scratch crate depending on lophelia-core by path, built from a copy of the tracked files outside the worktree
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/qa-scen c6-error
+Stdin: /dev/null
+--- stdout ---
+path JSON literal "":
+  Err code=malformed_path msg=malformed path "": empty
+path JSON literal "/etc/passwd":
+  Err code=malformed_path msg=malformed path "/etc/passwd": absolute
+path JSON literal "\\server\\share.md":
+  Err code=malformed_path msg=malformed path "\\server\\share.md": absolute
+path JSON literal "C:/x.md":
+  Err code=malformed_path msg=malformed path "C:/x.md": drive letter
+path JSON literal "c:x.md":
+  Err code=malformed_path msg=malformed path "c:x.md": drive letter
+path JSON literal "..":
+  Err code=malformed_path msg=malformed path "..": parent segment
+path JSON literal "../a.md":
+  Err code=malformed_path msg=malformed path "../a.md": parent segment
+path JSON literal "a/../b.md":
+  Err code=malformed_path msg=malformed path "a/../b.md": parent segment
+path JSON literal "a\\..\\b.md":
+  Err code=malformed_path msg=malformed path "a\\..\\b.md": parent segment
+path JSON literal "a/..":
+  Err code=malformed_path msg=malformed path "a/..": parent segment
+path JSON literal "./a.md":
+  Ok nodes=[] xyz=[]
+path JSON literal "a//b.md":
+  Ok nodes=[] xyz=[]
+path JSON literal "a/./b.md":
+  Ok nodes=[] xyz=[]
+path JSON literal "a.md\u0000":
+  Ok nodes=[] xyz=[]
+path JSON literal "   ":
+  Ok nodes=[] xyz=[]
+path JSON literal "1:x.md":
+  Ok nodes=[] xyz=[]
+malformed path on an entry with no matching node, after a valid one:
+  Err code=malformed_path msg=malformed path "../evil.md": parent segment
+--- stderr ---
+--- exit code ---
+0

@@ -1,0 +1,39 @@
+Scenario: c7 (contract called from JavaScript through the WASM module), nominal and invalid inputs; replayed once, identical output
+Build (in /tmp/qa-s2.eaMuzL/copy): cargo build --offline --release --locked --target wasm32-unknown-unknown -p lophelia-wasm, then wasm-bindgen 0.2.129 --target nodejs --out-dir /tmp/qa-s2.eaMuzL/wasm-node target/wasm32-unknown-unknown/release/lophelia_wasm.wasm
+Script: docs/qa/s2-contrat-moteur/wasm-scenarios.cjs (quoted whole there)
+Working directory: /tmp/qa-s2.eaMuzL/js (removed after the walk); node v26.11.1
+Command: node wasm-scenarios.cjs /tmp/qa-s2.eaMuzL/wasm-node
+Stdin: /dev/null
+--- stdout ---
+exports: Engine, KnownPositions, default_forces, engine_version
+engine_version(): 0.1.0
+default_forces(): Ok Float64Array 0.05,30,1,30
+new Engine([b.md, a.md, c/d.md]).node_count(): 3
+layout(edges [0,1], known [1]=(1,2,3), changed [2], seed 7, default forces): Ok Float64Array -13.501611812334456,2.4586503439197966,-27.941432926026785,1,2,3,-21.383676390283952,25.502849404723577,41.649828237392036
+second identical call equal: true
+changed empty, all known: output equals input (Object.is per value): true
+write_positions(out): Ok "{\"version\":1,\"positions\":[\n{\"path\":\"a.md\",\"x\":1.0,\"y\":2.0,\"z\":3.0},\n{\"path\":\"b.md\",\"x\":-13.501611812334456,\"y\":2.4586503439197966,\"z\":-27.941432926026785},\n{\"path\":\"c/d.md\",\"x\":-21.383676390283952,\"y\":25.502849404723577,\"z\":41.649828237392036}\n]}\n"
+read_positions(text): Ok KnownPositions 
+known.nodes: 1,0,2  known.xyz: 1,2,3,-13.501611812334456,2.4586503439197966,-27.941432926026785,-21.383676390283952,25.502849404723577,41.649828237392036
+round trip through JS equals out: true
+--- invalid inputs from JS
+new Engine([a.md, a.md]): threw Error message="duplicate_node: node \"a.md\" is given twice"
+layout odd edges [0]: threw Error message="malformed_input: malformed input: edges must hold (source, target) pairs"
+layout edge index 9: threw Error message="index_out_of_range: node index 9 is out of range"
+layout forces of length 3: threw Error message="malformed_input: malformed input: forces must hold exactly 4 values"
+layout forces with NaN: threw Error message="non_finite: non-finite number in settings"
+layout seed -1: Ok Float64Array 20.510034438427134,8.482846635042765,-22.830134077040327,-38.003481341709616,-41.28487856266442,-11.35578329034308,39.79815530084401,-25.09032613134721,-21.161283204123286
+layout seed 2**32: Ok Float64Array -10.687322973102608,-21.77201344419376,17.51419468720045,-6.571549327989675,23.078295189174995,2.0935362966805284,-42.23668319992124,29.985969181258312,42.54510907674839
+layout seed 1.5: Ok Float64Array 25.968870097420197,-1.2432028246052813,-2.1609568578163474,28.845008280856753,-24.386572462243123,20.32444914761522,5.7543811179805155,34.931776515401765,-1.0918395487634687
+layout edges as a plain array [0,1]: Ok Float64Array -10.687322973102608,-21.77201344419376,17.51419468720045,-6.571549327989675,23.078295189174995,2.0935362966805284,-42.23668319992124,29.985969181258312,42.54510907674839
+read_positions version 2: threw Error message="unsupported_version: unsupported format version 2"
+read_positions 1e999: threw Error message="non_finite_number: non-finite number: number out of range at line 1 column 50"
+read_positions broken JSON: threw Error message="invalid_json: invalid JSON: EOF while parsing a value at line 1 column 13"
+read_positions ../a.md: threw Error message="malformed_path: malformed path \"../a.md\": parent segment"
+read_positions 10 MiB + 1: threw Error message="too_large: file is 10485761 bytes, above the 10485760 byte limit"
+write_positions with 2 values: threw Error message="length_mismatch: expected 9 coordinates, got 2"
+write_positions with NaN: threw Error message="non_finite_number: non-finite number: position of \"b.md\""
+engine still usable after errors, node_count: 3
+--- stderr ---
+--- exit code ---
+0

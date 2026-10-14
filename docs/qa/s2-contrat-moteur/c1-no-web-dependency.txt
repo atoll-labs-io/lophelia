@@ -1,0 +1,28 @@
+Scenario: c1-no-web-dependency (the dependency listing the CI step greps)
+Working directory: /tmp/qa-s2.eaMuzL/copy (removed after the walk)
+Command: cargo tree --offline --locked -p lophelia-core -e normal,build --target all --prefix none
+Check: grep -cE '^(wasm-bindgen|js-sys|web-sys|gloo|obsidian)' on stdout gave 0
+Stdin: /dev/null
+--- stdout ---
+lophelia-core v0.1.0 (/tmp/qa-s2.eaMuzL/copy/crates/lophelia-core)
+serde v1.0.229
+serde_core v1.0.229
+serde_derive v1.0.229 (proc-macro)
+proc-macro2 v1.0.107
+unicode-ident v1.0.27
+quote v1.0.47
+proc-macro2 v1.0.107 (*)
+syn v3.0.9
+proc-macro2 v1.0.107 (*)
+quote v1.0.47 (*)
+unicode-ident v1.0.27
+serde_derive v1.0.229 (proc-macro) (*)
+serde_json v1.0.154
+itoa v1.0.18
+memchr v2.8.3
+serde v1.0.229 (*)
+serde_core v1.0.229 (*)
+zmij v1.0.23
+--- stderr ---
+--- exit code ---
+0

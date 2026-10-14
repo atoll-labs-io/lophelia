@@ -1,0 +1,13 @@
+Scenario: c2
+Script: docs/qa/s2-contrat-moteur/scenarios.rs (quoted whole there), the binary qa-scen of a scratch crate depending on lophelia-core by path, built from a copy of the tracked files outside the worktree
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/qa-scen c2
+Stdin: /dev/null
+--- stdout ---
+known_nodes [2,0,1], changed [], positions by node index: [0.1, -0.0, 1e300, -5e-324, 2.5, 3.0, 1.7976931348623157e308, 2.2250738585072014e-308, -7.25]
+output: [0.1, -0.0, 1e300, -5e-324, 2.5, 3.0, 1.7976931348623157e308, 2.2250738585072014e-308, -7.25]
+bit-identical to input: true
+same, other seed 999: bit-identical true
+--- stderr ---
+--- exit code ---
+0

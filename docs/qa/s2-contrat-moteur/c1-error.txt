@@ -1,0 +1,39 @@
+Scenario: c1-error
+Script: docs/qa/s2-contrat-moteur/scenarios.rs (quoted whole there), the binary qa-scen of a scratch crate depending on lophelia-core by path, built from a copy of the tracked files outside the worktree
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/qa-scen c1-error
+Stdin: /dev/null
+--- stdout ---
+Graph::new with duplicate id a.md:
+  Err code=duplicate_node msg=node "a.md" is given twice
+odd edges [0]:
+  Err code=malformed_input msg=malformed input: edges must hold (source, target) pairs
+edge index out of range [0,5]:
+  Err code=index_out_of_range msg=node index 5 is out of range
+changed index out of range [9]:
+  Err code=index_out_of_range msg=node index 9 is out of range
+known index out of range [7]:
+  Err code=index_out_of_range msg=node index 7 is out of range
+known_xyz with 2 values for 1 known node:
+  Err code=malformed_input msg=malformed input: known_xyz must hold 3 values per known node
+forces with 3 values:
+  Err code=malformed_input msg=malformed input: forces must hold exactly 4 values
+forces with 5 values:
+  Err code=malformed_input msg=malformed input: forces must hold exactly 4 values
+forces with NaN center:
+  Err code=non_finite msg=non-finite number in settings
+forces with +inf link distance:
+  Err code=non_finite msg=non-finite number in settings
+known_xyz with -inf:
+  Err code=non_finite msg=non-finite number in known_xyz
+known index given twice:
+  Err code=duplicate_node msg=node "a.md" is given twice
+u32::MAX index in edges:
+  Err code=index_out_of_range msg=node index 4294967295 is out of range
+negative link distance [0.05,30,1,-30]:
+  Ok(6 values) [5.740777115982732, -20.160747836680983, -1.8288724109964862, 9.3362365696299, 19.019605622823732, -15.300058334326586]
+huge link distance 1e308 with 2 nodes:
+  Ok(6 values) [-1.9135923719942442e307, 6.720249278893662e307, 6.096241369988288e306, -3.1120788565433e307, -6.339868540941244e307, 5.100019444775529e307]
+--- stderr ---
+--- exit code ---
+0

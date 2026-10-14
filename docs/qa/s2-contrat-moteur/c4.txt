@@ -1,0 +1,27 @@
+Scenario: c4
+Script: docs/qa/s2-contrat-moteur/scenarios.rs (quoted whole there), the binary qa-scen of a scratch crate depending on lophelia-core by path, built from a copy of the tracked files outside the worktree
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/qa-scen c4
+Stdin: /dev/null
+--- stdout ---
+ids: ["é.md", "b/c.md", "Z.md", "a.md", "say \"hi\".md", "a..b.md"]
+xyz: [1.0, 2.0, 3.0, -5e-324, 0.1, -0.0, 1e300, -1e-300, 1.7976931348623157e308, 0.30000000000000004, 0.3333333333333333, -2.5, 7.0, 8.0, 9.0, 0.0, 0.0, 0.0]
+written file:
+{"version":1,"positions":[
+{"path":"Z.md","x":1e+300,"y":-1e-300,"z":1.7976931348623157e+308},
+{"path":"a..b.md","x":0.0,"y":0.0,"z":0.0},
+{"path":"a.md","x":0.30000000000000004,"y":0.3333333333333333,"z":-2.5},
+{"path":"b/c.md","x":-5e-324,"y":0.1,"z":-0.0},
+{"path":"say \"hi\".md","x":7.0,"y":8.0,"z":9.0},
+{"path":"é.md","x":1.0,"y":2.0,"z":3.0}
+]}
+read back, nodes in file order: [2, 5, 3, 1, 4, 0]
+round trip bit-identical: true
+rewrite byte-identical: true
+graph with no node, write:
+  Ok "{\"version\":1,\"positions\":[\n]}\n"
+read back:
+  Ok nodes=[] xyz=[]
+--- stderr ---
+--- exit code ---
+0

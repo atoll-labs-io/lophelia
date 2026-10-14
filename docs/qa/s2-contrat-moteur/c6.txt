@@ -1,0 +1,25 @@
+Scenario: c6
+Script: docs/qa/s2-contrat-moteur/scenarios.rs (quoted whole there), the binary qa-scen of a scratch crate depending on lophelia-core by path, built from a copy of the tracked files outside the worktree
+Working directory: /tmp/qa-s2.eaMuzL (removed after the walk)
+Command: ./target/debug/qa-scen c6
+Stdin: /dev/null
+--- stdout ---
+ids: ["a.md", "a..b.md", "d/..x/n.md"]
+input file (gone.md has no node):
+{"version":1,"positions":[
+{"path":"a..b.md","x":1,"y":1,"z":1},
+{"path":"a.md","x":2,"y":2,"z":2},
+{"path":"d/..x/n.md","x":3,"y":3,"z":3},
+{"path":"gone.md","x":4,"y":4,"z":4}
+]}
+read: nodes=[1, 0, 2] xyz=[1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 3.0, 3.0, 3.0]
+next write:
+{"version":1,"positions":[
+{"path":"a..b.md","x":1.0,"y":1.0,"z":1.0},
+{"path":"a.md","x":2.0,"y":2.0,"z":2.0},
+{"path":"d/..x/n.md","x":3.0,"y":3.0,"z":3.0}
+]}
+gone.md present in next write: false
+--- stderr ---
+--- exit code ---
+0
