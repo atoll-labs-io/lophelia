@@ -71,12 +71,12 @@ Light up to:       2
 ## Commands
 
 ```
-Package manager:   —
-Install:           —
-Test:              —
-Typecheck:         —
+Package manager:   npm
+Install:           npm --prefix plugin ci && cargo fetch --locked
+Test:              cargo test --workspace --locked && node --test 'scripts/*.test.mjs'
+Typecheck:         npm --prefix plugin run typecheck
 E2E:               —
-Build:             —
+Build:             npm --prefix plugin run build
 Dev:               scripts/dev.sh
 ```
 
