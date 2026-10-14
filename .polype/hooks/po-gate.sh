@@ -11,8 +11,9 @@
 #                                 matches HEAD; ignored files do not count (ADR-0044)
 #   po-gate pre-commit [<base>]   non-zero, on every branch, when a staged environment file or an added line holding
 #                                 a private key or a known token is staged, or a CLAUDE.md or CLAUDE.local.md is
-#                                 added or modified at any depth; and on a code commit to story/<id> whose plan
-#                                 is not approved; the diff is taken against <base> when given, else HEAD
+#                                 added or modified at any depth unless Project CLAUDE file is kept; and on a code
+#                                 commit to story/<id> whose plan is not approved; the diff is taken against <base>
+#                                 when given, else HEAD
 #   po-gate floor-guard <id> <base>  scans `git diff <base>...story/<id>` for what lowers the bar of the checks:
 #                                 0 nothing, 1 one `<path>:<line>: <rule>: <detail>` per flag, 2 cannot verify
 #
@@ -257,8 +258,11 @@ secret_scan() {
 }
 
 # Claude Code reads AGENTS.md only while no CLAUDE.md exists (ADR-0086); deleting one is the fix, so it passes.
+# Only the exact value kept lets them through (ADR-0089): a missing line or a typo refuses as before.
 claude_md_check() {
-  local paths path found=no
+  local paths path found=no keep
+  keep="$(sed -n 's/^Project CLAUDE file:[[:space:]]*\(.*[^[:space:]]\)[[:space:]]*$/\1/p' "$(top)/AGENTS.local.md" 2>/dev/null | head -n 1)"
+  [ "$keep" = kept ] && return 0
   paths="$(git -c core.quotePath=false diff --cached --name-only --no-renames --diff-filter=d -z ${DIFF_BASE:+"$DIFF_BASE"} | tr '\0' '\n')" \
     || refuse "could not list the staged files; refusing the commit" || return 1
   while IFS= read -r path; do

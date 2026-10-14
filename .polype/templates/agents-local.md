@@ -35,6 +35,7 @@ Tracker:           none
 Model strong:      opus
 Model light:       sonnet
 Light up to:       2
+Project CLAUDE file: absorbed
 ```
 
 | Setting | Values |
@@ -67,6 +68,7 @@ Light up to:       2
 | Model strong | the model every deciding subagent (planner, designer, reviewer, qa, stories-reviewer) runs on: a name the Agent tool accepts, or `—` for the session's model |
 | Model light | the model the implementer runs on for a story whose complexity is at most `Light up to`: a name the Agent tool accepts, or `—` for the session's model |
 | Light up to | highest story complexity whose implementer runs on `Model light`; `—` means never |
+| Project CLAUDE file | `absorbed` — the installer moves a root `CLAUDE.md` or `CLAUDE.local.md` into `AGENTS.local.md` and the pre-commit refuses one at any depth (ADR-0086) · `kept` — both stay, the root `CLAUDE.md` starts with `@AGENTS.md` and the pre-commit lets them through (ADR-0089); with the line missing nothing is touched, and the installer, `check` and `po-session` name the setting |
 
 ## Commands
 

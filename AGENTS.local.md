@@ -84,4 +84,17 @@ Agents run these exactly as written. `—` means the project has no such command
 
 ## Conventions
 
-<< layout, stack, patterns, naming, commit style >>
+The repository had no base when these rules were written (ADR-0002): each rule cites the ADR or brief section that backs it instead of a `path:line`.
+
+- Code, identifiers, comments and commit messages are in English; documents under `docs/` are in French (atoll `AGENTS.md`).
+- Commit messages follow Conventional Commits (`type: subject`), as the history does.
+- `crates/lophelia-core` depends on no web or Obsidian crate (ADR-0003).
+- The plugin never computes a position: every layout goes through the engine contract (s2, premise 4 of `docs/brief.md`).
+- `web/render/` imports nothing from `obsidian` (ADR-0003, s11).
+- Never commit a `.wasm` file or a generated blob (base64 WASM or worker) (ADR-0004).
+- No network API in `plugin/`, `web/` or `demo/` (ADR-0004).
+- Only Obsidian's public API is used; the single undocumented access, if any, lives in one function under `plugin/src/vault/` (ADR-0005).
+- Everything Lophelia writes goes under `.lophelia/` through `vault.adapter`, atomically (temporary file, then rename); never `saveData` nor `vault.create` (ADR-0005).
+- Note names and paths are rendered as text (`textContent`), never through `innerHTML` (`docs/brief.md`, Security & abuse).
+- Rust passes `cargo fmt --check` and `cargo clippy -- -D warnings`; TypeScript compiles in strict mode.
+- Dependency versions are exact; every new dependency is justified in its pull request (`docs/brief.md`, Security & abuse).

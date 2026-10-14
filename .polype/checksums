@@ -1,5 +1,5 @@
 2557896153 831 .polype/templates/adr.md
-826260033 5911 .polype/templates/agents-local.md
+1139602285 6343 .polype/templates/agents-local.md
 3260360512 2097 .polype/templates/architecture.md
 3149650530 2053 .polype/templates/brief.md
 1886600924 341 .polype/templates/decisions-log.md
@@ -17,7 +17,7 @@
 2457356057 1737 .polype/templates/stories-review.md
 3017524982 1780 .polype/templates/verification-record.md
 1761541377 39643 .polype/hooks/po-bounds.sh
-1603639674 27059 .polype/hooks/po-gate.sh
+79994897 27410 .polype/hooks/po-gate.sh
 2080428839 3445 .polype/hooks/po-run.sh
-1843645687 10530 .polype/hooks/po-session.sh
+1412757971 11071 .polype/hooks/po-session.sh
 118128939 189 .polype/hooks/pre-commit
