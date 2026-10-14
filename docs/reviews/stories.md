@@ -7,61 +7,56 @@ Review status: complete
 ## Coverage
 | Scope item | Source section | Covered by | Covered |
 | --- | --- | --- | --- |
-| Capacité d'ouverture : le vault `~/dev` en 3D, exclusions d'Obsidian respectées | the wedge | s5-vue-vault-3d | yes |
-| Wedge 1 — groupes de liens lisibles, pas une boule | the wedge | s3-banc-evaluation, s4-disposition-lisible | yes |
-| Wedge 2 — disposition immobile d'une ouverture à l'autre, sans tremblement | the wedge | s4-disposition-lisible (aucun tremblement), s6-forme-persistante (écart 0) | yes |
-| Wedge 3 — note ajoutée ou reliée autrement rejoint ses voisines, ajustement amorti | the wedge | s8-ajustement-amorti, s9-renommage-suppression | yes |
-| Wedge 4 — navigation fluide sur ~2 500 notes | the wedge | s5-vue-vault-3d (60 img/s, jamais < 30) | yes |
-| Wedge 5 — un clic ouvre la note | the wedge | s5-vue-vault-3d | yes |
+| Le vault `~/dev` en 3D, exclusions d'Obsidian respectées (capacité d'ouverture) | the wedge | s5-vue-vault-3d | yes |
+| 1. Groupes de liens lisibles, pas une boule uniforme | the wedge | s3-banc-evaluation, s4-disposition-lisible | yes |
+| 2. Disposition parfaitement immobile tant que le vault ne change pas, sans tremblement | the wedge | s4-disposition-lisible (pas sans déplacement), s6-forme-persistante (critère 3a) | yes |
+| 3. Note ajoutée ou reliée autrement : rejoint ses voisines, ajustement amorti avec la distance | the wedge | s8-ajustement-amorti, s9-renommage-suppression | yes |
+| 4. Navigation fluide sur ~2 500 notes | the wedge | s5-vue-vault-3d (60 images/s, jamais sous 30) | yes |
+| 5. Un clic sur un nœud ouvre la note | the wedge | s5-vue-vault-3d | yes |
 | Build en CI depuis les sources, attestation de provenance, aucun binaire commité | the wedge | s1-chaine-release | yes |
-| Prémisse 1 — mémoire spatiale : forme qui ne bouge que là où le vault change, groupes vivants | ## Premises | s4, s6, s8, s9, s10 (« Appliquer » seul déclencheur global) | yes |
-| Prémisse 2 — complète l'IA, ne la remplace pas | ## Premises | s5 (aller droit à la note) ; aucune story d'IA | yes |
-| Prémisse 3 — aucun outil existant ne se répare à moindre coût | ## Premises | s1, s4 (moteur écrit de zéro, rien de New 3D Graph) | yes |
-| Prémisse 4 — moteur séparable de son hôte | ## Premises | s2-contrat-moteur, s5 (`web/render/` sans Obsidian), s11-demo-web | yes |
-| Prémisse 5 — un premier utilisateur suffit | ## Premises | s7-compteur-ouvertures (critère de réussite 1) | yes |
-| Prémisse 6 — discipline (tests, revue, build vérifiable), vault réel, second client | ## Premises | s1, s3, s11 | yes |
+| P1. Valeur par la mémoire spatiale : la forme ne bouge que quand le vault change, surtout là où il change | ## Premises | s4, s6, s8, s10 (« Appliquer » seul déclenche une réorganisation globale) | yes |
+| P2. Lophelia complète l'IA : voir l'ensemble, vérifier ou sourcer une réponse | ## Premises | s5 (clic → note, survol) | yes |
+| P3. Aucun outil existant ne se répare : rien n'est repris | ## Premises | s1, s4 (moteur écrit de zéro, rien de New 3D Graph) | yes |
+| P4. Moteur séparable de son hôte | ## Premises | s2-contrat-moteur (core sans dépendance web, vérifié en CI), s11-demo-web | yes |
+| P5. Un premier utilisateur suffit : Mathieu sur `~/dev` | ## Premises | s7-compteur-ouvertures (mesure du critère de réussite 1), s3 (instantané local de `~/dev`) | yes |
+| P6. Discipline (tests, revue, build vérifiable), vault réel ~2 500 notes, second client | ## Premises | s1, s3, s11 | yes |
 
 ## Exclusions
 | Excluded item | Source section | Revived by | Revived |
 | --- | --- | --- | --- |
-| Aucun adaptateur web, mobile ou autre vault en v1 (sauf la démo minimale juste après le wedge) | ## Wedge & non-goals | none (s11 est la démo permise, locale, sans publication ; voir finding sur son ordre) | no |
+| Aucun adaptateur web, mobile ou autre vault en v1 (page de démo minimale permise juste après le wedge) | ## Wedge & non-goals | none: s11 est la page de démo minimale que le non-objectif autorise. Elle reste locale, sans publication, et passe après le wedge (s11 dépend de s9) | no |
 | Pas d'édition de notes ni de liens depuis le graphe | ## Wedge & non-goals | none | no |
 | Pas de recherche ni de réponse par IA, pas de source Nautile | ## Wedge & non-goals | none | no |
-| Pas de fichiers autres que les notes Markdown | ## Wedge & non-goals | none (s5 : une note Markdown par nœud) | no |
-| Surbrillance de dossier et couleurs de `graph.json` | ## Wedge & non-goals | none (s5 les déclare hors wedge) | no |
-| Pas de synchronisation ni de partage entre machines ou personnes | ## Wedge & non-goals | none | no |
+| Pas de fichiers autres que les notes Markdown | ## Wedge & non-goals | none (s3 et s5 se limitent aux notes Markdown) | no |
+| Surbrillance de dossier et couleurs de `graph.json` | ## Wedge & non-goals | none (s5 les écarte explicitement) | no |
+| Pas de synchronisation ni de partage du vault | ## Wedge & non-goals | none (s9 détecte un `git mv` local, rien n'est synchronisé) | no |
 
 ## Checks
-- [x] Exclusions: no story revives an excluded item, under any name — a PRD's graveyard feature or a brief's non-goal
-- [x] No technical layer dressed as a story; contract stories meet their conditions (s2 : observable par ses tests et l'appel WASM, plus de deux stories en aval)
-- [ ] Every criterion can be checked by one test — un critère de s9 ne l'est pas (major), plusieurs imprécis (minor)
-- [x] Dependency order: no dependency on a later or unknown id (s1→…→s10 en chaîne, s11→s6)
-- [x] Complexity: no 5 left unsplit, every 4 names its risk (s1, s4, s8)
-- [x] Ids: `s<number>-<slug>`, unique, numbered in file order
-- [x] Owns: every story declares one; no two stories with no dependency between them hold entries that overlap — s1 à s10 forment une seule chaîne ; s11 (`demo/`) n'a de lien ni avec s7 ni avec s8, s9, s10, et `demo/` ne recoupe aucune de leurs entrées
-- [x] Surface : chaque story en déclare une ; `screen` (web), `endpoint` (lib) et `command` (cli) sont admis par `Platform: web, lib, cli`
+- [x] Exclusions : aucune story ne fait revenir un non-objectif, sous aucun nom
+- [x] Aucune couche technique déguisée en story. s2 remplit les conditions d'une story contrat : elle est observable par `tests/contract/` et l'appel WASM, et s3, s4, s6, s8 et s11 la listent dans `Depends on`
+- [ ] Chaque critère est vérifiable par un test (voir s2, s4 et s5 ci-dessous)
+- [x] Ordre des dépendances : aucune dépendance vers une story ultérieure ou inconnue
+- [x] Complexité : aucun 5. Les trois 4 (s1, s4, s8) nomment leur risque
+- [x] Ids : `s<number>-<slug>`, uniques, numérotés dans l'ordre du fichier
+- [x] Owns : toutes les stories en déclarent un. La chaîne de dépendances est linéaire (s1 → … → s9, puis s10 et s11), donc la seule paire sans dépendance est s10/s11. Leurs entrées (`plugin/src/...` contre `demo/`) sont disjointes
+- [x] Surface : chaque story en déclare une, admise par `web, lib, cli` (`screen` : web, `endpoint` : lib, `command` : cli)
+- [x] Enregistrements possédés : aucune ligne `Fixes` / `Corrige`, aucune ADR qui en remplace une autre
 
 ## Findings
-- major — s3-banc-evaluation (touche aussi s4, s8) — les notes disent « L'instantané de `~/dev` sera exporté plus tard par le plugin », mais aucune story ne livre cet export. Or le spike de s4 (« quel moteur sépare le mieux sur l'instantané de `~/dev` »), la mesure du diamètre de `~/dev` avec et sans `_cartes/` en ouverture de s8, et le seuil d'arrêt du 15/11/2026 du brief (« sur l'instantané de `~/dev` ») en dépendent tous. Il faut ajouter un critère à une story existante (par exemple s5) ou écrire une story qui produise l'instantané dans `bench/local/`.
-- major — s7-compteur-ouvertures — les notes stockent le compteur via `saveData` et le disent « local à la machine, pas une donnée du vault ». Or l'API `saveData` d'Obsidian écrit `data.json` sous `.obsidian/plugins/<id>/`, à l'intérieur du vault. Cela contredit la promesse de sécurité du brief, « Supprimer `.lophelia/` efface tout ce que Lophelia a écrit », et le compteur voyage avec le vault. Il faut soit placer le stockage sous `.lophelia/`, soit corriger la note et dire comment la promesse du brief tient.
-- major — s9-renommage-suppression — aucun test ne peut vérifier le critère « ses voisines ne bougent qu'au titre de l'ajustement amorti ». Il faut le reformuler en seuil mesurable, par exemple le critère 3b après une suppression.
-- minor — s2-contrat-moteur — les notes disent que s4, s6, s8 et s11 dépendent du contrat. Pourtant, seul s3 le cite dans `Depends on` ; les autres ne l'atteignent que par la chaîne. Or `agentic-stories` demande que chaque story qui utilise le contrat le liste.
-- minor — s2-contrat-moteur / s6-forme-persistante — le brief (Security & abuse) exige de valider « chemins connus » dans `positions.json`. Aucun critère ne dit ce que devient une entrée dont le chemin est inconnu du vault ou malformé.
-- minor — s11-demo-web — la story dépend de s6 seulement, donc la flotte peut la construire avant s8 et s9, c'est-à-dire avant la fin du wedge. Or le non-objectif la place « juste après le wedge » (pré-mortem, cause 8). Une dépendance à s9 respecterait cet ordre.
-- minor — s11-demo-web — dans « la fait afficher à l'identique », la référence de comparaison n'est pas nommée (chaque nœud aux coordonnées du fichier ?). La commande qui lance le serveur n'est pas nommée non plus.
-- minor — s1-chaine-release — les notes disent « Licence MIT à ajouter », mais `LICENSE` ne figure pas dans `Owns`.
-- minor — s5-vue-vault-3d — la story a 7 critères, dont deux outils hors de la tranche (le générateur de vault de test du banc et la commande de diagnostic d'images/s), en plus du worker, du WASM, de three.js et du spike exclusions. La complexité 3 semble basse, et il faut vérifier que le plan tient en ~10 tâches. Le générateur pourrait passer dans s3. Il faut aussi vérifier que la configuration du bundler pour le worker tombe bien sous les `Owns` déclarés (seuls des fichiers précis de `plugin/` y sont listés).
-- minor — s5-vue-vault-3d — le critère « On fait tourner, zoomer et déplacer la caméra à la souris » nomme l'action mais pas ce qu'on voit.
-- minor — s8-ajustement-amorti — dans « Après l'ajout ou le retrait d'un lien, la note concernée se rapproche de ses nouvelles voisines », le cas du retrait n'est pas défini : quelles nouvelles voisines, quel résultat attendu ?
-- minor — s10-reglages-forces — le fichier de `.lophelia/` qui garde les réglages n'est pas nommé. La story se rattache à la ligne Domain model de la gap map (forces réglables) plus qu'au wedge ; on l'accepte par le wedge 1 et la prémisse 1.
+- major — s2-contrat-moteur — Le critère 2 dit : « Un nœud dont la position est connue et qui n'est touché par aucun changement ressort à la position exacte d'entrée ». Mais le contrat ne reçoit que des nœuds, des arêtes, des positions connues et des réglages. Il n'a ni ensemble d'arêtes précédent ni liste de nœuds modifiés, donc rien dans ces entrées ne définit « touché par un changement ». Aucun test ne peut fixer ce que le critère attend. La lacune s'étend à s8, qui doit savoir quelle note a changé de liens pour amortir l'ajustement autour d'elle. Si le contrat doit porter un delta, s2 doit le dire dès maintenant : s8 ne possède ni `crates/lophelia-core/src/contract/` ni `docs/contracts/`.
+- major — s8-ajustement-amorti — Deux critères se mesurent « sur la série scriptée du banc » : le critère 2 (déplacement moyen par quart de distance) et le critère 5 (silhouette après la série). Le banc de s3 n'affiche que 3a et 3b dans sa sous-commande de stabilité. s8 ne possède ni `crates/lophelia-bench/` ni `crates/lophelia-core/Cargo.toml` ni `Cargo.lock`. Il ne peut donc ni ajouter ces mesures au banc, ni faire dépendre ses tests du calcul de silhouette du banc. Le critère ne peut pas être livré dans son `Owns`.
+- minor — s6-forme-persistante — Le critère 6 place une note absente de `positions.json` près de ses voisines, mais s6 ne possède que du code du plugin. Ce placement sera donc écrit en TypeScript dans l'hôte, ce qui déplace de la logique de disposition hors du moteur (prémisse 4), ou il exige du code moteur que s6 ne possède pas. Les notes ne disent pas où vit ce placement, ni s'il préfigure l'ajustement de s8.
+- minor — s4-disposition-lisible — « Deux composantes non reliées ne se superposent pas » ne nomme pas de mesure : boîtes englobantes disjointes, distance minimale entre nœuds ou enveloppes convexes. Le test devra en inventer une.
+- minor — s5-vue-vault-3d — Le critère 5 ne dit pas ce qu'est une « progression visible » (barre, pourcentage, texte). Le reste du critère (50 ms au plus) est mesurable.
+- minor — s3-banc-evaluation — 8 critères, au-delà des sept environ que permet la règle. Les sous-commandes `snapshot` et `vault` pourraient former une story à part, qui dépendrait du banc noté.
 
 ## Not verified
-- Prémisses 2 et 3 : ce sont des positions, pas des capacités. Je les ai comptées couvertes par l'absence de toute fonction d'IA et par un moteur écrit de zéro ; aucune story ne peut les « livrer » au sens strict.
-- Je n'ai pas pu dire si s8 peut faire passer l'ajustement incrémental par l'API de s2 sans toucher `crates/lophelia-wasm/src/`, qui ne figure pas dans ses `Owns`. Le planner de s8 doit trancher.
-- Les seuils (60 img/s, 2 s, 1 s, 50 ms, silhouette 0,3) ne se vérifient que sur la machine de Mathieu ou par les spikes. Je ne juge que leur forme de critère, pas leur faisabilité.
-- J'ai lu la vue du plugin Obsidian (Electron) comme un `screen` de la plateforme `web` ; ADR-0054 et ADR-0055 ne sont pas dans ce dépôt pour le confirmer.
-- Tous les `Commands` de `AGENTS.local.md` valent `—`, y compris `Dev`. Avec `QA stage: surfaces`, la QA des stories `screen` en aura besoin. C'est un réglage, pas un défaut des stories.
-- La revue précédente (`docs/reviews/stories.md`), le code et l'historique git sont hors du périmètre et n'ont pas été lus.
+- **Prémisses P2, P3 et P5.** Elles sont trop générales pour être reliées à une story par ses critères. Je les ai comptées couvertes sur la foi de s5 (clic → note), de s1/s4 (rien n'est repris de New 3D Graph) et de s7 (mesure du critère de réussite 1). Une personne doit confirmer que c'est bien ce que ces prémisses demandent.
+- **Taille de s1 et de s8 au regard de la limite d'environ dix tâches de plan.** s1 réunit une chaîne WASM, l'attestation, deux garde-fous de CI, l'audit et une vue Obsidian. s8 réunit l'algorithme moteur, la synchro du plugin, la persistance et des scénarios du banc. Je ne peux pas estimer le nombre de tâches sans plan : le planificateur doit découper s'il dépasse la limite.
+- **Mesures sur la machine de Mathieu.** s5 (60 images/s sur Arch, Hyprland) et s6 (moins de 2 s) ne peuvent pas tourner en CI. Leur reproductibilité dépend de la commande de diagnostic, et non de ce que dit le fichier des stories.
+- **Construction du module WASM par la démo (s11).** s11 ne possède que `demo/` et interdit de modifier le moteur et le rendu. Je ne peux pas dire si la cible web du module WASM se construit sans toucher `crates/lophelia-wasm/` ou `.github/`.
+- **Couverture des appels moteur depuis WASM pour s6, s8 et s9.** Aucune de ces stories ne possède `crates/lophelia-wasm/src/` sauf s9. Je suppose que l'appel unique exposé par s2 suffit ; je ne l'ai pas vérifié.
+- **Routage QA, hors du périmètre de cette revue.** `QA stage: surfaces` envoie toutes les stories `screen` (s1, s5 à s11) en QA. Or `Dev:` vaut `—` dans `AGENTS.local.md`, et ces écrans vivent dans Obsidian (Electron), pas dans une page servie. La QA de ces stories devra trouver comment piloter Obsidian. C'est une question de réglages et non de stories ; à porter à `/po-setup` ou `/po-architect`.
 
 Max severity: major
 Stories ready: yes
