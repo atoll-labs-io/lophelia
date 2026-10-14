@@ -1,0 +1,59 @@
+Criterion 2 - `cargo run -p lophelia-bench -- <graphe>` shows silhouette, computing time and, when a reference exists, the gap to it
+Working directory: <tmp>/repo (copy of the tracked files, tree 46a3767d844eab05c2f91b020005168bdf19d371)
+Environment: CARGO_TARGET_DIR=<tmp>/target (dev profile)
+stdin: none
+
+$ cargo run -q -p lophelia-bench -- bench/graphs/sbm-100.json
+graphe : sbm-100 (100 nœuds, 347 arêtes, 4 communautés)
+silhouette moteur : -0.070507
+silhouette naïve : 0.460019
+temps de calcul du moteur : 0.036 ms
+référence : aucune
+--- exit code: 0 ---
+
+$ cargo run -q -p lophelia-bench -- bench/graphs/sbm-1000.json
+graphe : sbm-1000 (1000 nœuds, 3620 arêtes, 10 communautés)
+silhouette moteur : -0.057257
+silhouette naïve : 0.399012
+temps de calcul du moteur : 0.314 ms
+référence : aucune
+--- exit code: 0 ---
+
+$ cargo run -q -p lophelia-bench -- bench/graphs/sbm-2500.json
+graphe : sbm-2500 (2500 nœuds, 8622 arêtes, 20 communautés)
+silhouette moteur : -0.063995
+silhouette naïve : 0.303299
+temps de calcul du moteur : 0.796 ms
+référence : aucune
+--- exit code: 0 ---
+
+# With a reference (written in the copy only, then removed)
+$ cargo run -q -p lophelia-bench -- bench/graphs/sbm-100.json --record
+graphe : sbm-100 (100 nœuds, 347 arêtes, 4 communautés)
+silhouette moteur : -0.070507
+silhouette naïve : 0.460019
+temps de calcul du moteur : 0.053 ms
+référence : aucune
+référence enregistrée : <tmp>/bench/references/sbm-100.json
+--- exit code: 0 ---
+
+$ cat bench/references/sbm-100.json
+{"silhouette":-0.07050720523923039}
+
+$ cargo run -q -p lophelia-bench -- bench/graphs/sbm-100.json
+graphe : sbm-100 (100 nœuds, 347 arêtes, 4 communautés)
+silhouette moteur : -0.070507
+silhouette naïve : 0.460019
+temps de calcul du moteur : 0.046 ms
+écart à la référence : +0.000000
+--- exit code: 0 ---
+
+$ echo '{"silhouette":0.25}' > bench/references/sbm-100.json
+$ cargo run -q -p lophelia-bench -- bench/graphs/sbm-100.json
+graphe : sbm-100 (100 nœuds, 347 arêtes, 4 communautés)
+silhouette moteur : -0.070507
+silhouette naïve : 0.460019
+temps de calcul du moteur : 0.095 ms
+écart à la référence : -0.320507
+--- exit code: 0 ---
+(-0.070507 - 0.25 = -0.320507: the gap is engine minus reference)

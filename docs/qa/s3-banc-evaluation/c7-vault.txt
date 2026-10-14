@@ -1,0 +1,31 @@
+Criterion 7 - `vault <graphe> <dossier>` writes a test vault outside the repository
+Working directory: <tmp>/repo
+Environment: CARGO_TARGET_DIR=<tmp>/target
+stdin: none
+
+$ cargo run -q -p lophelia-bench -- vault bench/graphs/sbm-100.json <tmp>/scratch/vault-100
+vault écrit : <tmp>/scratch/vault-100 (100 notes)
+--- exit code: 0 ---
+
+$ find . -name '*.md' | wc -l           (in <tmp>/scratch/vault-100)
+101                                      (100 notes + node_modules/exclue.md)
+$ ls -a
+c00 c01 c02 c03 node_modules .obsidian
+$ cat .obsidian/app.json
+{"userIgnoreFilters":["node_modules/"]}
+$ ls node_modules ; cat node_modules/exclue.md
+exclue.md
+# exclue
+[[n00-0000]]
+$ cat c00/n00-0000.md
+# n00-0000
+[[n00-0001]]
+[[n00-0002]]
+[[n00-0003]]
+[[n00-0004]]
+[[n00-0006]]
+[[n00-0009]]
+[[n00-0014]]
+[[n00-0015]]
+$ grep -rho '\[\[[^]]*\]\]' --include='*.md' . | wc -l
+348                                      (347 edges of sbm-100 + the link of exclue.md)

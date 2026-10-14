@@ -1,12 +1,16 @@
 [workspace]
 resolver = "3"
-members = ["crates/lophelia-core", "crates/lophelia-wasm"]
+members = ["crates/lophelia-core", "crates/lophelia-wasm", "crates/lophelia-bench"]
 
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/atoll-labs-io/lophelia"
+
+# `cargo run -p lophelia-bench` runs in debug, and the naive layout is O(n²) per iteration.
+[profile.dev.package.lophelia-bench]
+opt-level = 3
 
 [profile.release]
 opt-level = "z"

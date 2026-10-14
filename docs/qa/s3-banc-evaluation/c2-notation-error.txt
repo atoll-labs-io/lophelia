@@ -1,0 +1,40 @@
+Criterion 2 - invalid inputs
+Working directory: <tmp>/repo
+Environment: CARGO_TARGET_DIR=<tmp>/target
+stdin: none
+
+$ cargo run -q -p lophelia-bench
+--- stderr ---
+usage :
+  lophelia-bench <graphe.json> [--record]
+  lophelia-bench generate
+  lophelia-bench stability <graphe.json> <scénario.json>
+  lophelia-bench snapshot <dossier-vault>
+  lophelia-bench vault <graphe.json> <dossier>
+--- exit code: 2 ---
+
+$ cargo run -q -p lophelia-bench -- bench/graphs/absent.json
+erreur : io: bench/graphs/absent.json: No such file or directory (os error 2)
+--- exit code: 1 ---
+
+$ echo 'not json' > <tmp>/scratch/bad.json
+$ cargo run -q -p lophelia-bench -- <tmp>/scratch/bad.json
+erreur : invalid_json: invalid JSON: expected ident at line 1 column 2
+--- exit code: 1 ---
+
+$ cargo run -q -p lophelia-bench -- bench/graphs/sbm-100.json --recrod
+--- stderr ---
+usage :
+  lophelia-bench <graphe.json> [--record]
+  lophelia-bench generate
+  lophelia-bench stability <graphe.json> <scénario.json>
+  lophelia-bench snapshot <dossier-vault>
+  lophelia-bench vault <graphe.json> <dossier>
+--- exit code: 2 ---
+(F4: the unknown option is not named)
+
+# Corrupt reference file (F1: the message does not say the reference file is the one at fault; replayed once, same output)
+$ echo '{"silhouette":"x"}' > bench/references/sbm-100.json
+$ cargo run -q -p lophelia-bench -- bench/graphs/sbm-100.json
+erreur : invalid_json: invalid JSON: invalid type: string "x", expected f64 at line 1 column 17
+--- exit code: 1 ---

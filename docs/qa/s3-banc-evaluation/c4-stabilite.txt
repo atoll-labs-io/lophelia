@@ -1,0 +1,32 @@
+Criterion 4 - stability subcommand replays a scripted series and shows 3a and 3b
+Working directory: <tmp>/repo
+Environment: CARGO_TARGET_DIR=<tmp>/target
+stdin: none
+
+$ cat bench/scenarios/base.json
+{"version":1,"steps":[
+{"link":["c00/n00-0000.md","c01/n01-0000.md"]},
+{"link":["c02/n02-0001.md","c03/n03-0001.md"]},
+{"unlink":["c00/n00-0000.md","c01/n01-0000.md"]},
+{"create":"c00/n00-new.md","links":["c00/n00-0002.md","c00/n00-0003.md"]}
+]}
+
+$ cargo run -q -p lophelia-bench -- stability bench/graphs/sbm-100.json bench/scenarios/base.json
+étape 1 (link c00/n00-0000.md c01/n01-0000.md) : 3a = 0 ; 3b = 0.000000 % du rayon
+étape 2 (link c02/n02-0001.md c03/n03-0001.md) : 3a = 0 ; 3b = 0.000000 % du rayon
+étape 3 (unlink c00/n00-0000.md c01/n01-0000.md) : 3a = 0 ; 3b = 0.000000 % du rayon
+étape 4 (create c00/n00-new.md → c00/n00-0002.md, c00/n00-0003.md) : 3a = 0 ; 3b = 0.000000 % du rayon
+3a max : 0
+3b max : 0.000000 % du rayon
+--- exit code: 0 ---
+
+$ cargo run -q -p lophelia-bench -- stability bench/graphs/sbm-2500.json bench/scenarios/base.json
+étape 1 (link c00/n00-0000.md c01/n01-0000.md) : 3a = 0 ; 3b = 0.000000 % du rayon
+étape 2 (link c02/n02-0001.md c03/n03-0001.md) : 3a = 0 ; 3b = 0.000000 % du rayon
+étape 3 (unlink c00/n00-0000.md c01/n01-0000.md) : 3a = 0 ; 3b = 0.000000 % du rayon
+étape 4 (create c00/n00-new.md → c00/n00-0002.md, c00/n00-0003.md) : 3a = 0 ; 3b = 0.000000 % du rayon
+3a max : 0
+3b max : 0.000000 % du rayon
+--- exit code: 0 ---
+
+Note: with the current engine (s2) every 3b reads 0; a non-zero 3b cannot be produced from the command line (see Not seen).

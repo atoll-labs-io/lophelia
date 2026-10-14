@@ -1,0 +1,27 @@
+Criterion 1 - synthetic graphs of 100, 1 000 and 2 500 nodes, known communities, fixed seed
+Working directory: <tmp>/repo (copy of the files tracked on story/s3-banc-evaluation, tree 46a3767d844eab05c2f91b020005168bdf19d371)
+Environment: CARGO_TARGET_DIR=<tmp>/target
+stdin: none
+
+$ sha256sum bench/graphs/*.json
+b286af26a7a1b25a7ca99f6b782f5ba945a972be0ad0071001c38ad6f2ea31bd  bench/graphs/sbm-1000.json
+821ba55cbb549f12c75480b9764c786973556e3231af3fbb195a7d4e0dce537d  bench/graphs/sbm-100.json
+ebfa30969d5cff3fae5313cc0d2af731f4d99ae664e623397fa59ec8005a4f9c  bench/graphs/sbm-2500.json
+
+$ cargo run -q -p lophelia-bench -- generate
+--- stdout ---
+<tmp>/bench/graphs/sbm-100.json
+<tmp>/bench/graphs/sbm-1000.json
+<tmp>/bench/graphs/sbm-2500.json
+--- exit code: 0 ---
+(run while the copy sat at <tmp>/ before it was moved to <tmp>/repo)
+
+$ sha256sum bench/graphs/*.json        # after regeneration: byte-identical to the committed files
+b286af26a7a1b25a7ca99f6b782f5ba945a972be0ad0071001c38ad6f2ea31bd  bench/graphs/sbm-1000.json
+821ba55cbb549f12c75480b9764c786973556e3231af3fbb195a7d4e0dce537d  bench/graphs/sbm-100.json
+ebfa30969d5cff3fae5313cc0d2af731f4d99ae664e623397fa59ec8005a4f9c  bench/graphs/sbm-2500.json
+
+$ grep -c '"community"' <file> ; distinct community values
+sbm-100.json  : 100 nodes, 4 communities
+sbm-1000.json : 1000 nodes, 10 communities
+sbm-2500.json : 2500 nodes, 20 communities
