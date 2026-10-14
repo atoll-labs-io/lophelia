@@ -23,7 +23,7 @@ QA stage:          surfaces
 Issue tracker:     github
 Worktree root:     .worktrees/
 ADR directory:     docs/decisions/
-Entry mode:        adapt
+Entry mode:        new
 Design source:     internal
 Design skill:      frontend-design
 Design tool:       —
