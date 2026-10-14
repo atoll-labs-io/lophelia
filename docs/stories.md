@@ -19,6 +19,7 @@ Each story is a slice a user can actually use, described precisely enough that a
 - [ ] La CI échoue si le bundle publié contient une API réseau (`fetch`, `XMLHttpRequest`, `WebSocket`, modules `http`/`https`/`net`, `requestUrl`).
 - [ ] Installé dans un vault, le plugin ajoute une commande « Ouvrir Lophelia » qui ouvre une vue affichant la version du moteur, renvoyée par une fonction du module WASM.
 - [ ] Les dépendances sont verrouillées (`Cargo.lock`, lockfile npm) et installées en mode strict en CI ; les outils de build (Rust, wasm-pack ou wasm-bindgen, Node) ont une version fixe.
+- [ ] Chaque build CI lance un audit des avis de sécurité des dépendances (`cargo audit` pour Rust, `npm audit` pour le plugin) et échoue sur un avis de gravité haute ou critique.
 
 ### Notes for the agent
 Risque principal (spike 6 du brief, prioritaire) : charger du WASM dans un plugin Obsidian sans committer de blob. New 3D Graph y parvient en commitant du base64 généré : c'est précisément ce qui est interdit ici. Le WASM est produit au build et embarqué dans `main.js` par l'outil de bundle. Mesurer la taille du bundle et la noter dans la PR. Disposition proposée : workspace Cargo avec `crates/lophelia-core/` (moteur, sans dépendance web) et `crates/lophelia-wasm/` (liaisons), plugin TypeScript sous `plugin/`. Rien n'est repris de New 3D Graph (ADR-0001, pré-mortem cause 5). Licence MIT à ajouter.
@@ -67,7 +68,7 @@ Aucune donnée de `~/dev` dans le dépôt, même hachée (pré-mortem, cause 6).
 - **Complexity**: 4
 - **Depends on**: s3-banc-evaluation
 - **Surface**: `command`
-- **Owns**: `Cargo.lock`, `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/layout/`, `crates/lophelia-core/tests/layout/`, `bench/references/`
+- **Owns**: `Cargo.lock`, `crates/lophelia-core/Cargo.toml`, `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/layout/`, `crates/lophelia-core/tests/layout/`, `bench/references/`
 
 ### Acceptance criteria
 - [ ] Sur les trois graphes synthétiques, la silhouette du moteur dépasse d'au moins 0,1 celle de la disposition naïve du banc (s3) et vaut au moins 0,3 ; la valeur obtenue est enregistrée dans `bench/references/` comme référence pour s8.
@@ -85,15 +86,16 @@ Risque principal (spike « groupes lisibles en 3D » du brief) : New 3D Graph pr
 - **Complexity**: 3
 - **Depends on**: s4-disposition-lisible
 - **Surface**: `screen`
-- **Owns**: `plugin/src/main.ts`, `plugin/src/view/`, `plugin/src/vault/`, `plugin/styles.css`, `plugin/package.json`, `plugin/package-lock.json`, `web/render/`
+- **Owns**: `plugin/src/main.ts`, `plugin/src/view/`, `plugin/src/vault/`, `plugin/styles.css`, `plugin/package.json`, `plugin/package-lock.json`, `web/render/`, `crates/lophelia-bench/`
 
 ### Acceptance criteria
 - [ ] La vue montre un nœud par note Markdown du vault, sauf celles exclues par les « Fichiers exclus » d'Obsidian (`userIgnoreFilters`) ; une note sous `node_modules/` n'apparaît pas.
 - [ ] Les arêtes sont les liens résolus entre notes (`resolvedLinks`) ; un lien vers une note exclue ou inexistante ne crée pas d'arête.
 - [ ] On fait tourner, zoomer et déplacer la caméra à la souris.
 - [ ] Un clic sur un nœud ouvre la note correspondante ; le survol affiche son nom comme du texte, jamais interprété en HTML.
-- [ ] Le calcul de disposition tourne hors du fil principal : l'interface d'Obsidian reste utilisable pendant le calcul, avec une progression visible.
-- [ ] Sur le graphe synthétique de 2 500 nœuds, une commande de diagnostic affiche au moins 60 images/s en rotation.
+- [ ] Le calcul de disposition tourne hors du fil principal : pendant le calcul, le fil principal n'est jamais bloqué plus de 50 ms (mesuré par le diagnostic), avec une progression visible.
+- [ ] `cargo run -p lophelia-bench -- vault <graphe> <dossier>` génère, hors du dépôt, un vault de test : une note Markdown par nœud, un lien `[[…]]` par arête, et un dossier `node_modules/` déclaré dans les « Fichiers exclus » de son `.obsidian/app.json`.
+- [ ] Sur le vault généré depuis le graphe de 2 500 nœuds, sur la machine de Mathieu (Arch, Hyprland), une commande de diagnostic affiche au moins 60 images/s en rotation, et jamais moins de 30.
 
 ### Notes for the agent
 Spike « exclusions » du brief : trouver l'API Obsidian fiable pour `userIgnoreFilters` (le graphe natif, Graph+ et New 3D Graph ne l'appliquent pas). Le rendu three.js vit dans `web/render/` et n'importe rien d'Obsidian : la page de démo (s11) le réutilise. Positions recalculées à chaque ouverture dans cette story ; la persistance vient avec s6. Surbrillance de dossier et couleurs de `graph.json` sont hors wedge.
@@ -111,7 +113,8 @@ Spike « exclusions » du brief : trouver l'API Obsidian fiable pour `userIgnore
 - [ ] Fermer puis rouvrir Obsidian sans modifier le vault affiche chaque nœud à la position exacte enregistrée (critère 3a : écart 0).
 - [ ] L'écriture est atomique (fichier temporaire puis renommage) : un fichier tronqué n'existe jamais à la place du bon.
 - [ ] Un `positions.json` invalide n'est ni écrasé ni utilisé : il est renommé à côté, une notice Obsidian le signale, et une disposition neuve est calculée.
-- [ ] Le graphe complet s'affiche en moins de 2 s quand les positions existent, sur le vault de 2 500 notes.
+- [ ] Le graphe complet s'affiche en moins de 2 s quand les positions existent, sur le vault de test généré par s5 depuis le graphe de 2 500 nœuds.
+- [ ] Une note présente dans le vault mais absente de `positions.json` est placée à une distance de ses notes liées inférieure à la distance médiane entre nœuds liés du graphe ; les autres ne bougent pas.
 - [ ] Supprimer `.lophelia/` fait repartir d'un premier calcul, sans erreur.
 
 ### Notes for the agent
@@ -127,11 +130,11 @@ Le bug de Filamental : un fichier écrit avec `vault.create` dans un dossier cac
 
 ### Acceptance criteria
 - [ ] Chaque ouverture de la vue enregistre la date du jour dans les données locales du plugin, au plus une fois par jour.
-- [ ] Les réglages du plugin affichent, pour le mois en cours, le nombre de jours ouvrés avec ouverture et la moyenne par semaine.
+- [ ] Les réglages du plugin affichent, pour le mois en cours, le nombre de jours ouvrés avec ouverture et la moyenne par semaine ; un jour ouvré va du lundi au vendredi, jours fériés compris.
 - [ ] Aucune donnée ne quitte la machine (le contrôle réseau de la CI, s1, reste vert).
 
 ### Notes for the agent
-Stockage via `saveData` du plugin (local à la machine, volontairement : c'est une mesure d'usage, pas une donnée du vault).
+Sert la prémisse 5 (un premier utilisateur suffit) en mesurant le critère de réussite 1. Stockage via `saveData` du plugin (local à la machine, volontairement : c'est une mesure d'usage, pas une donnée du vault).
 
 ## s8-ajustement-amorti — Une note ajoutée ou reliée autrement trouve sa place sans bouleverser le reste
 **As** Mathieu **I want** qu'une note créée ou dont les liens changent rejoigne ses voisines, que ses voisines proches s'ajustent et que l'ajustement s'amortisse avec la distance **so that** le graphe reste vivant sans que je perde la forme mémorisée.
@@ -142,7 +145,8 @@ Stockage via `saveData` du plugin (local à la machine, volontairement : c'est u
 - **Owns**: `crates/lophelia-core/src/lib.rs`, `crates/lophelia-core/src/adjust/`, `crates/lophelia-core/tests/adjust/`, `bench/scenarios/`, `plugin/src/main.ts`, `plugin/src/sync/`, `plugin/src/persistence/`
 
 ### Acceptance criteria
-- [ ] Une note créée, la vue ouverte, apparaît en moins de 1 s près des notes qu'elle relie, sans figer l'interface.
+- [ ] Une note créée, la vue ouverte, apparaît en moins de 1 s à une distance de ses notes liées inférieure à la distance médiane entre nœuds liés du graphe ; pendant l'ajustement, le fil principal n'est jamais bloqué plus de 50 ms.
+- [ ] Sur la série scriptée du banc, les voisins directs de la note modifiée bougent (déplacement moyen non nul), et le déplacement moyen décroît avec la distance : le quart des nœuds les plus proches bouge plus que le quart suivant, qui bouge plus que la moitié la plus éloignée.
 - [ ] Après l'ajout ou le retrait d'un lien, la note concernée se rapproche de ses nouvelles voisines.
 - [ ] Sur la série scriptée du banc, la moitié des nœuds les plus éloignés de la note modifiée bougent de moins de 1 % du rayon du graphe (critère 3b ; seuil réglable).
 - [ ] Le score de silhouette après la série reste au-dessus de la référence de s4.
@@ -157,13 +161,14 @@ Risque principal (spike « propagation amortie », 3 jours sur le banc, point de
 - **Complexity**: 3
 - **Depends on**: s8-ajustement-amorti
 - **Surface**: `screen`
-- **Owns**: `plugin/src/sync/`, `plugin/src/persistence/`, `crates/lophelia-core/src/positions/`
+- **Owns**: `plugin/src/sync/`, `plugin/src/persistence/`, `crates/lophelia-core/src/positions/`, `crates/lophelia-core/tests/contract/`, `crates/lophelia-wasm/src/`, `docs/contracts/`
 
 ### Acceptance criteria
 - [ ] Une note renommée ou déplacée dans Obsidian garde exactement sa position ; `positions.json` porte le nouveau chemin.
 - [ ] Une note supprimée disparaît de la vue et de `positions.json` ; ses voisines ne bougent qu'au titre de l'ajustement amorti.
 - [ ] Une note renommée Obsidian fermé (`git mv`) retrouve sa position à l'ouverture suivante, quand son contenu n'a pas changé.
 - [ ] Quand le rapprochement est impossible (contenu modifié en même temps), la note est traitée comme nouvelle, sans erreur.
+- [ ] `positions.json` passe à la version 2 de son format, avec une empreinte de contenu par note ; un fichier en version 1 est lu, réécrit en version 2, et une copie de l'ancien est gardée à côté ; `docs/contracts/moteur.md` décrit la version 2.
 
 ### Notes for the agent
 Spike « renommage Obsidian fermé » du brief : une empreinte de contenu stockée avec la position permet de rapprocher une note disparue d'une note apparue. Les agents de Mathieu renomment souvent hors d'Obsidian. Événements Obsidian : `vault.on("rename")`, `vault.on("delete")`.
