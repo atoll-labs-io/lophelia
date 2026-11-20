@@ -7,3 +7,4 @@ plugin/main.js
 plugin/wasm-pkg/
 *.wasm
 bench/local/
+.polype/inbox/
